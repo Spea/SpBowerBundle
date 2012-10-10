@@ -1,0 +1,36 @@
+{
+    "name": "sp/bower-bundle",
+    "type": "symfony-bundle",
+    "description": "Handle asset dependencies with bower",
+    "keywords": ["asset", "dependencies", "package manager"],
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Martin Parsiegla",
+            "email": "martin.parsiegla@gmail.com",
+            "homepage": "http://speanet.info"
+        },
+        {
+            "name": "Community contributions",
+            "homepage": "https://github.com/Spea/SpBowerBundle/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": "2.1.*",
+        "symfony/process": "2.1.*"
+    },
+    "require-dev":{
+        "symfony/console": ">=2.0,<2.2-dev",
+        "phpspec/phpspec2": "*",
+        "phpunit/phpunit": "3.7.7"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-0": { "Sp\\BowerBundle": "" }
+    },
+    "target-dir": "Sp/BowerBundle"
+}
