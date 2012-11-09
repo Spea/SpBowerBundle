@@ -5,7 +5,9 @@ php:
     - 5.4
 
 before_script:
+    - nvm install v0.8.12
+    - nvm use 0.8.12
+    - sudo npm -g install bower
     - composer install --dev
-    - npm install bower
 
 script: phpunit --configuration phpunit.travis.xml
