@@ -12,6 +12,10 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @author Martin Parsiegla <parsiegla@kuponjo.de>
@@ -24,14 +28,9 @@ class BowerManager
     protected $bower;
 
     /**
-     * @var array
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $components;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
 
     /**
      * @param Bower $bower
@@ -39,48 +38,28 @@ class BowerManager
     public function __construct(Bower $bower)
     {
         $this->bower = $bower;
+        $this->components = new ArrayCollection();
     }
 
-    /**
-     * @param string $name
-     * @param string $src
-     * @param null   $target
-     */
-    public function addComponent($name, $src, $target = null)
-    {
-        if (null === $target) {
-            $target = $src;
-        }
 
-        $this->components[$name] = array(
+    /**
+     * @param \Symfony\Component\Config\Resource\DirectoryResource $src
+     * @param \Symfony\Component\Config\Resource\DirectoryResource $target
+     */
+    public function addComponent(DirectoryResource $src, DirectoryResource $target )
+    {
+        $this->components->add(array(
             'src' => $src,
             'target' => $target
-        );
+        ));
     }
 
     /**
-     *
+     * @return array
      */
-    public function install()
+    public function getComponents()
     {
-        foreach ($this->components as $component) {
-            $this->bower->install($component['src'], $component['target'], $this->getOutput());
-        }
+        return $this->components;
     }
 
-    /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     */
-    public function setOutput($output)
-    {
-        $this->output = $output;
-    }
-
-    /**
-     * @return \Symfony\Component\Console\Output\OutputInterface
-     */
-    public function getOutput()
-    {
-        return $this->output;
-    }
 }

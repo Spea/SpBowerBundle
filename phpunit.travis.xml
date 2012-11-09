@@ -9,7 +9,7 @@
     </testsuites>
 
     <php>
-        <!-- <server name="BOWER_BIN" value="/usr/bin/bower" /> -->
+        <server name="BOWER_BIN" value="/usr/bin/bower" />
     </php>
 
     <filter>

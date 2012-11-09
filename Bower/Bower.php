@@ -12,6 +12,9 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,43 +23,51 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Bower
 {
+    /**
+     * @var string
+     */
     protected $bowerPath;
 
     /**
-     * @param string $bowerPath
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
-    public function __construct($bowerPath = '/usr/bin/bower')
+    protected $eventDispatcher;
+
+    /**
+     * @param string                                             $bowerPath
+     * @param \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher
+     */
+    public function __construct($bowerPath = '/usr/bin/bower', EventDispatcher $eventDispatcher)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->bowerPath = $bowerPath;
     }
 
     /**
      * Installs bower dependencies from a source directory to a target directory.
      *
-     * @param string                                            $src
-     * @param string                                            $target
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param string|\Symfony\Component\Config\Resource\DirectoryResource $source
+     * @param \Symfony\Component\Config\Resource\DirectoryResource        $target
+     * @param null                                                        $callback
+     *
+     * @throws \InvalidArgumentException
      *
      * @return int
      */
-    public function install($src, $target, OutputInterface $output = null)
+    public function install($source, DirectoryResource $target, $callback = null)
     {
-        $target = realpath($target);
-        $src = realpath($src);
-        if (null === $output) {
-            $output = new NullOutput();
+        if (!is_string($source) && !$source instanceof DirectoryResource) {
+            throw new \InvalidArgumentException('The source must be a string or an instance of DirectoryResource');
         }
 
-        chdir($target);
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL);
 
         $pb = new ProcessBuilder(array($this->bowerPath));
+        $pb->setWorkingDirectory($target);
         $pb->add("install");
-        $pb->add($src);
+        $pb->add($source);
         $proc = $pb->getProcess();
 
-        $callback = function($type, $data) use ($output) {
-            $output->write($data);
-        };
 
         return $proc->run($callback);
     }

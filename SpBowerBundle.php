@@ -12,7 +12,16 @@
 namespace Sp\BowerBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Sp\BowerBundle\DependencyInjection\Compiler\ComponentPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SpBowerBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new ComponentPass());
+    }
+
 }

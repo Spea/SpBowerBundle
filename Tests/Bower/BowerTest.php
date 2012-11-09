@@ -12,6 +12,11 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * @author Martin Parsiegla <parsiegla@kuponjo.de>
@@ -23,9 +28,33 @@ class BowerTest extends \PHPUnit_Framework_TestCase
      */
     protected $bower;
 
-    protected function setUp()
+    /**
+     * @var string
+     */
+    protected $target;
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    public function setUp()
     {
-        $this->bower = new Bower('/usr/bin/bower');
+        if (!isset($_SERVER['BOWER_BIN'])) {
+            $this->markTestSkipped('There is no SASS_BIN environment variable.');
+        }
+
+        $this->bower = new Bower($_SERVER['BOWER_BIN'], new EventDispatcher());
+        $this->target = sys_get_temp_dir() .'/bower_install';
+        $this->filesystem = new Filesystem();
+        $this->filesystem->mkdir($this->target);
+    }
+
+    public function tearDown()
+    {
+        if ($this->filesystem) {
+            $this->filesystem->remove($this->target);
+        }
     }
 
     /**
@@ -33,22 +62,17 @@ class BowerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstall()
     {
-        $output = $this->createOutputMock();
-        $output->expects($this->any(6))->method('write');
-
         $src = __DIR__ .'/Fixtures';
-        $target = sys_get_temp_dir() .'/test_target';
-        if (!file_exists($target)) {
-            mkdir($target);
-        }
 
-        $this->bower->install($src .'/component.json', $target, $output);
+        $this->bower->install(new DirectoryResource($src), new DirectoryResource($this->target));
 
-        $this->assertFileExists($target .'/components');
+        $this->assertFileExists($this->target .'/components');
     }
 
-    private function createOutputMock()
+    public function testPackageInstall()
     {
-        return $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
+        $this->bower->install('jquery', new DirectoryResource($this->target));
+
+        $this->assertFileExists($this->target .'/components');
     }
 }
