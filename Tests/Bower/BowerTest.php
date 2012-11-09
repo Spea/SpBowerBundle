@@ -12,6 +12,8 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
+use Sp\BowerBundle\Bower\BowerEvent;
+use Sp\BowerBundle\Bower\BowerEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -29,6 +31,11 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     protected $bower;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var string
      */
     protected $target;
@@ -44,7 +51,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('There is no SASS_BIN environment variable.');
         }
 
-        $this->bower = new Bower($_SERVER['BOWER_BIN'], new EventDispatcher());
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->bower = new Bower($_SERVER['BOWER_BIN'], $this->eventDispatcher);
         $this->target = sys_get_temp_dir() .'/bower_install';
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->target);
@@ -67,12 +75,26 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->bower->install(new DirectoryResource($src), new DirectoryResource($this->target));
 
         $this->assertFileExists($this->target .'/components');
+        $this->assertFileExists($this->target .'/components/jquery');
     }
 
     public function testPackageInstall()
     {
-        $this->bower->install('jquery', new DirectoryResource($this->target));
+        $this->bower->install('backbone', new DirectoryResource($this->target));
 
         $this->assertFileExists($this->target .'/components');
+        $this->assertFileExists($this->target .'/components/backbone');
+        $this->assertFileExists($this->target .'/components/backbone/backbone.js');
+    }
+
+    public function testEventDispatcher()
+    {
+        $target = new DirectoryResource($this->target);
+        $event = new BowerEvent('backbone', $target, Bower::TYPE_PACKAGE);
+
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_INSTALL), $this->equalTo($event));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_INSTALL), $this->equalTo($event));
+
+        $this->bower->install('backbone', $target);
     }
 }

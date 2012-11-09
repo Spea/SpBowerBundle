@@ -23,6 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Bower
 {
+    const TYPE_PACKAGE = 1;
+    const TYPE_FILE = 2;
+
     /**
      * @var string
      */
@@ -60,7 +63,13 @@ class Bower
             throw new \InvalidArgumentException('The source must be a string or an instance of DirectoryResource');
         }
 
-        $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL);
+        $type = self::TYPE_FILE;
+        if (is_string($source)) {
+            $type = self::TYPE_PACKAGE;
+            $source = str_replace(DIRECTORY_SEPARATOR, '', $source);
+        }
+
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL, new BowerEvent($source, $target, $type));
 
         $pb = new ProcessBuilder(array($this->bowerPath));
         $pb->setWorkingDirectory($target);
@@ -68,7 +77,11 @@ class Bower
         $pb->add($source);
         $proc = $pb->getProcess();
 
+        $status = $proc->run($callback);
+        $this->eventDispatcher->dispatch(BowerEvents::POST_INSTALL, new BowerEvent($source, $target, $type));
 
-        return $proc->run($callback);
+        return $status;
     }
+
+
 }

@@ -12,16 +12,61 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Config\Resource\DirectoryResource;
 
 /**
- * Date: 09.11.12
- * Time: 02:16
  * @author Martin Parsiegla <parsiegla@kuponjo.de>
  */
 class BowerEvent extends Event
 {
-
+    /**
+     * @var string|\Symfony\Component\Config\Resource\DirectoryResource
+     */
     protected $source;
 
+    /**
+     * @var \Symfony\Component\Config\Resource\DirectoryResource
+     */
     protected $target;
+
+    /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @param string|\Symfony\Component\Config\Resource\DirectoryResource $source
+     * @param \Symfony\Component\Config\Resource\DirectoryResource        $target
+     * @param string                                                      $type
+     */
+    public function __construct($source, DirectoryResource $target, $type)
+    {
+        $this->source = $source;
+        $this->target = $target;
+        $this->type = $type;
+    }
+
+    /**
+     * @return string|\Symfony\Component\Config\Resource\DirectoryResource
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @return \Symfony\Component\Config\Resource\DirectoryResource
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 }
