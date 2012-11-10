@@ -71,8 +71,9 @@ class Bower
 
         $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL, new BowerEvent($source, $target, $type));
 
-        $pb = new ProcessBuilder(array($this->bowerPath));
+        $pb = $this->getProcessBuilder();
         $pb->setWorkingDirectory($target);
+        $pb->add($this->bowerPath);
         $pb->add("install");
         $pb->add($source);
         $proc = $pb->getProcess();
@@ -83,5 +84,12 @@ class Bower
         return $status;
     }
 
+    /**
+     * @return \Symfony\Component\Process\ProcessBuilder
+     */
+    protected function getProcessBuilder()
+    {
+        return new ProcessBuilder();
+    }
 
 }
