@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sp/BowerBundle.
+ * This file is part of the SpBowerBundle package.
  *
  * (c) Martin Parsiegla <martin.parsiegla@gmail.com>
  *
@@ -18,7 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Doctrine\Common\Collections\Collection;
 
 /**
- * @author Martin Parsiegla <parsiegla@kuponjo.de>
+ * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
 class BowerManager
 {
@@ -30,7 +30,7 @@ class BowerManager
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $components;
+    protected $paths;
 
     /**
      * @param Bower $bower
@@ -38,28 +38,24 @@ class BowerManager
     public function __construct(Bower $bower)
     {
         $this->bower = $bower;
-        $this->components = new ArrayCollection();
+        $this->paths = new ArrayCollection();
     }
 
-
     /**
-     * @param \Symfony\Component\Config\Resource\DirectoryResource $src
-     * @param \Symfony\Component\Config\Resource\DirectoryResource $target
+     * @param string        $configDir
+     * @param Configuration $configuration
      */
-    public function addComponent(DirectoryResource $src, DirectoryResource $target )
+    public function addPath($configDir, Configuration $configuration)
     {
-        $this->components->add(array(
-            'src' => $src,
-            'target' => $target
-        ));
+        $this->paths->set($configDir, $configuration);
     }
 
     /**
      * @return array
      */
-    public function getComponents()
+    public function getPaths()
     {
-        return $this->components;
+        return $this->paths;
     }
 
 }

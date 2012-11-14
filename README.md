@@ -1,7 +1,17 @@
-SPBowerBundle
+SpBowerBundle
 =============
 
-The SPBowerBundle adds support for handling asset dependencies with bower in a nice way.
+The SpBowerBundle adds support for handling asset dependencies with bower in a nice way.
+
+Documentation
+-------------
+
+[Read the Documentation for master](https://github.com/Spea/SpBowerBundle/blob/master/Resources/doc/index.md)
+
+Installation
+------------
+
+All the installation instructions are located in the [documentation](https://github.com/Spea/SpBowerBundle/blob/master/Resources/doc/index.md).
 
 License
 -------

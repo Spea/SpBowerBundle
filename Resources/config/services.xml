@@ -6,7 +6,8 @@
 
     <parameters>
         <parameter key="sp_bower.bower.class">Sp\BowerBundle\Bower\Bower</parameter>
-        <parameter key="sp_bower.bower.manager.class">Sp\BowerBundle\Bower\BowerManager</parameter>
+        <parameter key="sp_bower.bower_manager.class">Sp\BowerBundle\Bower\BowerManager</parameter>
+        <parameter key="sp_bower.bower.configuration.class">Sp\BowerBundle\Bower\Configuration</parameter>
         <parameter key="sp_bower.bower.bin">/usr/bin/bower</parameter>
         <parameter key="sp_bower.file_resource.class">Symfony\Component\Config\Resource\FileResource</parameter>
         <parameter key="sp_bower.directory_resource.class">Symfony\Component\Config\Resource\DirectoryResource</parameter>
@@ -18,7 +19,7 @@
             <argument type="service" id="event_dispatcher" />
         </service>
 
-        <service id="sp_bower.bower.manager" class="%sp_bower.bower.manager.class%">
+        <service id="sp_bower.bower_manager" class="%sp_bower.bower_manager.class%">
             <argument type="service" id="sp_bower.bower" />
         </service>
     </services>

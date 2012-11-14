@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sp/BowerBundle.
+ * This file is part of the SpBowerBundle package.
  *
  * (c) Martin Parsiegla <martin.parsiegla@gmail.com>
  *
@@ -17,11 +17,4 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SpBowerBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new ComponentPass());
-    }
-
 }

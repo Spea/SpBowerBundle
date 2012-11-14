@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Sp/BowerBundle.
+ * This file is part of the SpBowerBundle package.
  *
  * (c) Martin Parsiegla <martin.parsiegla@gmail.com>
  *
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * @author Martin Parsiegla <parsiegla@kuponjo.de>
+ * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
 class InstallCommand extends ContainerAwareCommand
 {
@@ -28,8 +28,6 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName('sp:bower:install')
             ->setDescription('Install all bower dependencies.')
-            ->addArgument('package', InputArgument::OPTIONAL, 'The package name to install')
-            ->addOption('bundle', 'b', InputOption::VALUE_REQUIRED, 'The bundle to install the package to')
             ->setHelp(<<<EOT
 The <info>sp:bower:install</info> command installs bower dependencies for every bundle:
 
@@ -40,27 +38,16 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bowerManager = $this->getContainer()->get('sp_bower.bower.manager');
-        $bower = $this->getContainer()->get('sp_bower.bower');
+        $bowerManager = $this->getBowerManager();
+        $bower = $this->getBower();
         $kernel = $this->getContainer()->get('kernel');
         $callback = function($type, $data) use($output) {
             $output->write($data);
         };
 
-
-        if (($package = $input->getArgument('package')) !== null) {
-            if (($bundle = $input->getOption('bundle')) === null) {
-                throw new \InvalidArgumentException('You must specify a bundle to install the package to');
-            }
-
-            $target = $kernel->getBundle($bundle)->getPath() .'/Resources/public/';
-
-            return $this->getBower()->install($package, new DirectoryResource($target), $callback);
-        }
-
-
-        foreach ($this->getBowerManager()->getComponents() as $component) {
-            $this->getBower()->install($component['src'], $component['target'], $callback);
+        foreach ($bowerManager->getPaths() as $configDir => $configuration) {
+            $bower->init($configDir, $configuration);
+            $bower->install($configDir, $callback);
         }
     }
 
@@ -69,7 +56,7 @@ EOT
      */
     protected function getBowerManager()
     {
-        return $this->getContainer()->get('sp_bower.bower.manager');
+        return $this->getContainer()->get('sp_bower.bower_manager');
     }
 
     /**

@@ -1,15 +1,25 @@
 <?php
+
+/*
+ * This file is part of the SpBowerBundle package.
+ *
+ * (c) Martin Parsiegla <martin.parsiegla@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Sp\BowerBundle\Bower\Configuration;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * Date: 10.11.12
- * Time: 17:39
- * @author Martin Parsiegla <parsiegla@kuponjo.de>
+ * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
 class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +34,7 @@ class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->target = sys_get_temp_dir() .'/bower_install';
-        $this->bower = new Bower($_SERVER['BOWER_BIN'], new EventDispatcher());
+        $this->bower = new Bower($_SERVER['BOWER_BIN']);
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->target);
     }
@@ -36,19 +46,15 @@ class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testPackageInstall()
-    {
-        $this->bower->install('backbone', new DirectoryResource($this->target));
-
-        $this->assertFileExists($this->target .'/components');
-        $this->assertFileExists($this->target .'/components/backbone');
-        $this->assertFileExists($this->target .'/components/backbone/backbone.js');
-    }
-
     public function testFileInstall()
     {
+        $configuration = new Configuration();
+        $configuration->setJsonFile('component.json');
+        $configuration->setEndpoint('https://bower.herokuapp.com');
         $src = __DIR__ .'/Fixtures';
-        $this->bower->install(new DirectoryResource($src), new DirectoryResource($this->target));
+        $configuration->setDirectory($this->filesystem->makePathRelative($this->target .'/components', $src));
+        $this->bower->init($src, $configuration);
+        $this->bower->install($src);
 
         $this->assertFileExists($this->target .'/components');
         $this->assertFileExists($this->target .'/components/jquery');
