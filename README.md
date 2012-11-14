@@ -3,6 +3,16 @@ SpBowerBundle
 
 The SpBowerBundle adds support for handling asset dependencies with bower in a nice way.
 
+Features included:
+
+- Install bower packages in your bundles with one command
+- Register all installed bower packages as assets so they can be used in templates
+- Unit tested
+
+**Caution:** This bundle is developed in sync with [symfony's repository](https://github.com/symfony/symfony).
+
+[![Build Status](https://secure.travis-ci.org/Spea/SpBowerBundle.png?branch=master)](https://travis-ci.org/Spea/SpBowerBundle)
+
 Documentation
 -------------
 
