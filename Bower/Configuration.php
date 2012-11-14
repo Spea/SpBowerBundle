@@ -49,6 +49,7 @@ class Configuration
 
     /**
      * @param $endpoint
+     * @param string $endpoint
      */
     public function setEndpoint($endpoint)
     {
@@ -65,6 +66,7 @@ class Configuration
 
     /**
      * @param $json
+     * @param string $json
      */
     public function setJsonFile($json)
     {

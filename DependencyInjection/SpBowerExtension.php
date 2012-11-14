@@ -27,6 +27,7 @@ class SpBowerExtension extends Extension
 {
     /**
      * {@inheritDoc}
+     * @param array $configs
      */
     public function load(array $configs, ContainerBuilder $container)
     {
