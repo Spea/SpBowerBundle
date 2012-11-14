@@ -12,11 +12,8 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Sp\BowerBundle\Bower\Configuration;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>

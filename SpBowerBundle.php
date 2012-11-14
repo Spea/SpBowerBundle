@@ -12,8 +12,6 @@
 namespace Sp\BowerBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Sp\BowerBundle\DependencyInjection\Compiler\ComponentPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SpBowerBundle extends Bundle
 {

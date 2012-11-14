@@ -12,12 +12,6 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\Process\ProcessBuilder;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
