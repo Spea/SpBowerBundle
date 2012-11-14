@@ -11,10 +11,7 @@
 
 namespace Sp\BowerBundle\Bower;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\Config\Resource\FileResource;
 use Doctrine\Common\Collections\Collection;
 
 /**

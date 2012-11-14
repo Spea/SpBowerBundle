@@ -12,7 +12,6 @@
 namespace Sp\BowerBundle\Assetic;
 
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\Bower;
 
