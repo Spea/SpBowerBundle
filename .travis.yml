@@ -6,3 +6,8 @@ php:
 
 before_script:
     - composer install --dev
+
+script: phpunit --coverage-clover "clover"
+
+after_success:
+    - curl -sL https://bit.ly/artifact-uploader | php
