@@ -11,8 +11,6 @@
 
 namespace Sp\BowerBundle\Bower;
 
-use Symfony\Component\Config\Resource\DirectoryResource;
-
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
