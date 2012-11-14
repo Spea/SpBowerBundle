@@ -71,9 +71,9 @@ class Bower
     /**
      * Get the dependency mapping from the installed packages.
      *
-     * @param $configDir
+     * @param string $configDir
      *
-     * @return array|mixed
+     * @return array
      */
     public function getDependencyMapping($configDir)
     {
@@ -107,9 +107,9 @@ class Bower
     }
 
     /**
-     * @param string        $configDir
-     * @param array         $commands
-     * @param null|\closure $callback
+     * @param string                $configDir
+     * @param string|array          $commands
+     * @param \Closure|string|array $callback
      *
      * @return \Symfony\Component\Process\Process
      */

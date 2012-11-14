@@ -27,11 +27,9 @@ class InstallCommandTest extends \PHPUnit_Framework_TestCase
     private $kernel;
     private $container;
     private $command;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     private $bower;
     private $bm;
+    private $helperset;
 
     /**
      * Sets up the fixture, for example, opens a network connection.

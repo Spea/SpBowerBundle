@@ -40,7 +40,6 @@ EOT
     {
         $bowerManager = $this->getBowerManager();
         $bower = $this->getBower();
-        $kernel = $this->getContainer()->get('kernel');
         $callback = function($type, $data) use($output) {
             $output->write($data);
         };

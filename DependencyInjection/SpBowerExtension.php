@@ -79,7 +79,6 @@ class SpBowerExtension extends Extension
                 $pathConfig['asset_dir'] = $filesystem->makePathRelative($pathConfig['asset_dir'], $pathConfig['config_dir']);
             }
 
-            $configId = sprintf('sp_bower.bower.%s_configuration', $bundleName);
             $configuration = new Definition('%sp_bower.bower.configuration.class%');
             $configuration->addMethodCall('setDirectory', array($pathConfig['asset_dir']));
             $configuration->addMethodCall('setJsonFile', array($pathConfig['json_file']));
