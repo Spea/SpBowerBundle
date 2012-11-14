@@ -67,7 +67,7 @@ class Bower
      *
      * @param string $configDir
      *
-     * @return array
+     * @return mixed
      */
     public function getDependencyMapping($configDir)
     {
@@ -81,7 +81,7 @@ class Bower
     }
 
     /**
-     * @return \Symfony\Component\Process\ProcessBuilder
+     * @return ProcessBuilder
      */
     public function getProcessBuilder()
     {
@@ -103,7 +103,7 @@ class Bower
     /**
      * @param string                $configDir
      * @param string|array          $commands
-     * @param \Closure|string|array $callback
+     * @param \Closure|string|array|null $callback
      *
      * @return \Symfony\Component\Process\Process
      */

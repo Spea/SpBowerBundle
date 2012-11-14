@@ -48,7 +48,7 @@ class BowerManager
     }
 
     /**
-     * @return array
+     * @return ArrayCollection
      */
     public function getPaths()
     {
