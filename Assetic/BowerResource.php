@@ -117,7 +117,7 @@ class BowerResource extends ConfigurationResource
      * @param string $configDir
      * @param array  $files
      *
-     * @return array
+     * @return array<*,string>
      */
     protected function resolvePaths($configDir, array $files = array())
     {
