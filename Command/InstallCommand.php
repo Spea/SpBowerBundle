@@ -44,6 +44,7 @@ EOT
         foreach ($bowerManager->getPaths() as $configDir => $configuration) {
             $bower->init($configDir, $configuration);
             $bower->install($configDir, $callback);
+            $bower->createDependencyMappingCache($configDir);
         }
     }
 

@@ -1,0 +1,22 @@
+{
+    "foo_package": {
+        "source": {
+            "main": [
+                "../components/foo_package/foo.css",
+                "../components/foo_package/barfoo.js"
+            ]
+        },
+        "dependencies": {
+            "package": {
+                "source": {
+                    "main": "../components/package/package.js"
+                }
+            }
+        }
+    },
+    "package": {
+        "source": {
+            "main": "../components/package/package.js"
+        }
+    }
+}

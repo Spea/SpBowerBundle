@@ -11,12 +11,19 @@
         <parameter key="sp_bower.bower.bin">/usr/bin/bower</parameter>
         <parameter key="sp_bower.file_resource.class">Symfony\Component\Config\Resource\FileResource</parameter>
         <parameter key="sp_bower.directory_resource.class">Symfony\Component\Config\Resource\DirectoryResource</parameter>
+        <parameter key="sp_bower.filesystem_cache.class">Doctrine\Common\Cache\FilesystemCache</parameter>
     </parameters>
 
     <services>
+
+        <service id="sp_bower.filesystem_cache" class="%sp_bower.filesystem_cache.class%">
+            <argument>%kernel.cache_dir%/sp_bower</argument>
+            <argument>.sp_bower.data</argument>
+        </service>
+
         <service id="sp_bower.bower" class="%sp_bower.bower.class%">
             <argument>%sp_bower.bower.bin%</argument>
-            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="sp_bower.filesystem_cache" />
         </service>
 
         <service id="sp_bower.bower_manager" class="%sp_bower.bower_manager.class%">

@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\Process\ProcessBuilder;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -29,11 +30,18 @@ class Bower
     protected $processBuilder;
 
     /**
-     * @param string $bowerPath
+     * @var \Doctrine\Common\Cache\Cache
      */
-    public function __construct($bowerPath = '/usr/bin/bower')
+    protected $cache;
+
+    /**
+     * @param string                       $bowerPath
+     * @param \Doctrine\Common\Cache\Cache $cache
+     */
+    public function __construct($bowerPath = '/usr/bin/bower', Cache $cache)
     {
         $this->bowerPath = $bowerPath;
+        $this->cache = $cache;
     }
 
     /**
@@ -63,21 +71,43 @@ class Bower
     }
 
     /**
-     * Get the dependency mapping from the installed packages.
+     * Creates the cache for the dependency mapping.
      *
      * @param string $configDir
      *
-     * @return mixed
+     * @throws Exception
+     * @return \Sp\BowerBundle\Bower\Bower
      */
-    public function getDependencyMapping($configDir)
+    public function createDependencyMappingCache($configDir)
     {
         $proc = $this->execCommand($configDir, array('list', '--map'));
         $output = $proc->getOutput();
         if (strpos($output, 'error')) {
-            return array();
+            throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
         }
 
-        return json_decode($output, true);
+        $mapping = json_decode($output, true);
+
+        $this->cache->save($configDir, $mapping);
+
+        return $this;
+    }
+
+    /**
+     * Get the dependency mapping from the installed packages.
+     *
+     * @param string $configDir
+     *
+     * @throws Exception
+     * @return mixed
+     */
+    public function getDependencyMapping($configDir)
+    {
+        if (!$this->cache->contains($configDir)) {
+            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $configDir));
+        }
+
+        return $this->cache->fetch($configDir);
     }
 
     /**

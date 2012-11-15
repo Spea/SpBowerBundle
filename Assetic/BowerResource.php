@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Assetic;
 
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
+use Sp\BowerBundle\Bower\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\Bower;
 
@@ -47,41 +48,63 @@ class BowerResource extends ConfigurationResource
     {
         $formulae = array();
         foreach ($this->bowerManager->getPaths() as $configDir => $paths) {
-            $mapping = $this->bower->getDependencyMapping($configDir);
-            foreach ($mapping as $packageName => $values) {
+            try  {
+                $mapping = $this->bower->getDependencyMapping($configDir);
+            } catch (Exception $ex) {
+                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache');
+            }
+
+            foreach ($mapping as $packageName => $package) {
                 $packageName = str_replace('.', '_', $packageName);
-                $files = $values['source']['main'];
-                if (is_string($files)) {
-                    $files = array($files);
-                }
-
-                $cssFiles = array();
-                $jsFiles = array();
-                if (isset($values['dependencies'])) {
-                    foreach ($values['dependencies'] as $packageDependency => $value) {
-                        $packageDependency = str_replace('.', '_', $packageDependency);
-                        $jsFiles[] = '@'. $packageDependency .'_js';
-                        $cssFiles[] = '@'. $packageDependency .'_css';
-                    }
-                }
-
-                foreach ($files as $file) {
-                    if ($this->isJavascript($file)) {
-                        $jsFiles[] = $file;
-                    }
-
-                    if ($this->isStylesheet($file)) {
-                        $cssFiles[] = $file;
-                    }
-                }
-
-                $cssFiles = $this->resolvePaths($configDir, $cssFiles);
-                $jsFiles = $this->resolvePaths($configDir, $jsFiles);
-
-                $formulae[$packageName .'_css'] = array($cssFiles, array(), array());
-                $formulae[$packageName .'_js'] = array($jsFiles, array(), array());
+                $formulae = array_merge($this->createPackageFormulae($package, $packageName, $configDir), $formulae);
             }
         }
+
+        return $formulae;
+    }
+
+    /**
+     * Creates formulae for the given package.
+     *
+     * @param array  $package
+     * @param string $packageName
+     * @param string $configDir
+     *
+     * @return array
+     */
+    protected function createPackageFormulae(array $package, $packageName, $configDir)
+    {
+        $formulae = array();
+        $files = $package['source']['main'];
+        if (is_string($files)) {
+            $files = array($files);
+        }
+
+        $cssFiles = array();
+        $jsFiles = array();
+        if (isset($package['dependencies'])) {
+            foreach ($package['dependencies'] as $packageDependency => $value) {
+                $packageDependency = str_replace('.', '_', $packageDependency);
+                $jsFiles[] = '@' . $packageDependency . '_js';
+                $cssFiles[] = '@' . $packageDependency . '_css';
+            }
+        }
+
+        foreach ($files as $file) {
+            if ($this->isJavascript($file)) {
+                $jsFiles[] = $file;
+            }
+
+            if ($this->isStylesheet($file)) {
+                $cssFiles[] = $file;
+            }
+        }
+
+        $cssFiles = $this->resolvePaths($configDir, $cssFiles);
+        $jsFiles = $this->resolvePaths($configDir, $jsFiles);
+
+        $formulae[$packageName . '_css'] = array($cssFiles, array(), array());
+        $formulae[$packageName . '_js'] = array($jsFiles, array(), array());
 
         return $formulae;
     }

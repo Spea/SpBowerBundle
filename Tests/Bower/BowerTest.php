@@ -45,13 +45,20 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected  $process;
+    protected $process;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $cache;
 
     public function setUp()
     {
         $this->target = sys_get_temp_dir() .'/bower_install';
-        $this->bower = $this->getMock('Sp\BowerBundle\Bower\Bower', array('getProcessBuilder'), array($this->bin));
+        $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $this->bower = new Bower($this->bin, $this->cache);
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
+        $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->target);
@@ -70,8 +77,6 @@ class BowerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstall($configDir)
     {
-        $this->bower->expects($this->once())->method('getProcessBuilder')->will($this->returnValue($this->processBuilder));
-
         $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
@@ -82,11 +87,36 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->bower->install($configDir);
     }
 
+    /**
+     * @covers Sp\BowerBundle\Bower\Bower::testCreateDependencyMappingCache
+     */
+    public function testCreateDependencyMappingCache()
+    {
+        $configDir = "/config_dir";
+
+        $jsonDependencyMapping = file_get_contents(__DIR__ .'/Fixtures/dependency_mapping.json');
+        $arrayDependencyMapping = require __DIR__ .'/Fixtures/dependency_mapping.php';
+
+        $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
+        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('list'));
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
+        $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+
+        $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
+        $this->process->expects($this->once())->method('getOutput')->will($this->returnValue($jsonDependencyMapping));
+
+        $this->cache->expects($this->once())->method('save')->with($this->equalTo($configDir), $this->equalTo($arrayDependencyMapping));
+
+        $this->bower->createDependencyMappingCache($configDir);
+    }
+
     public function componentsProvider()
     {
         return array(
-            array(__DIR__ .'/Fixtures'),
+            array(__DIR__ .'/Fixtures/config'),
             array(new DirectoryResource('test')),
         );
     }
+
 }

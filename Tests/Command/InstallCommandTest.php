@@ -116,9 +116,12 @@ class InstallCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->bower->expects($this->at(0))->method('init')->with($this->equalTo('/foo'), $this->equalTo($configuration));
         $this->bower->expects($this->at(1))->method('install')->with($this->equalTo('/foo'));
+        $this->bower->expects($this->at(2))->method('createDependencyMappingCache')->with($this->equalTo('/foo'));
 
-        $this->bower->expects($this->at(2))->method('init')->with($this->equalTo('/bar'), $this->equalTo($barConfig));
-        $this->bower->expects($this->at(3))->method('install')->with($this->equalTo('/bar'));
+        $this->bower->expects($this->at(3))->method('init')->with($this->equalTo('/bar'), $this->equalTo($barConfig));
+        $this->bower->expects($this->at(4))->method('install')->with($this->equalTo('/bar'));
+        $this->bower->expects($this->at(5))->method('createDependencyMappingCache')->with($this->equalTo('/bar'));
+
 
         $this->bm->expects($this->once())
             ->method('getPaths')
