@@ -121,10 +121,6 @@ then you can use them in your templates (or wherever you need them) like this
 > Your site may be slowed down if you enabled ```use_controller``` in the assetic bundle and
 > ```register_assets``` in this bundle.
 
-### Todo
-
-- Fix ```git error 127```
-
 ### Next Steps
 
 - [Configuration Reference](configuration_reference.md)
