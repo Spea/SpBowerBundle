@@ -88,7 +88,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sp\BowerBundle\Bower\Bower::testCreateDependencyMappingCache
+     * @covers Sp\BowerBundle\Bower\Bower::createDependencyMappingCache
      */
     public function testCreateDependencyMappingCache()
     {
