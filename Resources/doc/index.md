@@ -20,6 +20,7 @@ Installation
 3. Configure the bundle
 4. Installing bower dependencies
 5. Use the installed assets in your templates
+6. Add composer scripts for automatic update of dependencies
 
 ### Step 1: Download SpBowerBundle using composer
 
