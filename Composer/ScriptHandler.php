@@ -48,7 +48,9 @@ class ScriptHandler
 
     protected static function getOptions($event)
     {
-        $options = $event->getComposer()->getPackage()->getExtra();
+        $options = array_merge(array(
+            'symfony-app-dir' => 'app',
+        ), $event->getComposer()->getPackage()->getExtra());
 
         $options['process-timeout'] = $event->getComposer()->getConfig()->get('process-timeout');
 
