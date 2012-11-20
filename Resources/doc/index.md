@@ -20,6 +20,7 @@ Installation
 3. Configure the bundle
 4. Installing bower dependencies
 5. Use the installed assets in your templates
+6. Add composer scripts for automatic update of dependencies
 
 ### Step 1: Download SpBowerBundle using composer
 
@@ -120,6 +121,21 @@ then you can use them in your templates (or wherever you need them) like this
 **Warning**:
 > Your site may be slowed down if you enabled ```use_controller``` in the assetic bundle and
 > ```register_assets``` in this bundle.
+
+### Step 6: Add composer scripts for automatic update of dependencies
+
+```json
+{
+   "scripts": {
+       "post-install-cmd": [
+           "Sp\\BowerBundle\\Composer\\ScriptHandler::bowerInstall"
+       ],
+       "post-update-cmd": [
+           "Sp\\BowerBundle\\Composer\\ScriptHandler::bowerInstall"
+       ]
+   }
+}
+```
 
 ### Next Steps
 
