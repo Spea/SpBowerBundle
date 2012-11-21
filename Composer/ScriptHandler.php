@@ -11,7 +11,6 @@
 
 namespace Sp\BowerBundle\Composer;
 
-use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Composer\Script\Event;
@@ -80,7 +79,7 @@ class ScriptHandler
     }
 
     /**
-     * @return string
+     * @return string|false
      * @throws \RuntimeException
      */
     protected static function getPhp()
