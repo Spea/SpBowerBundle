@@ -33,5 +33,10 @@
     "autoload": {
         "psr-0": { "Sp\\BowerBundle": "" }
     },
-    "target-dir": "Sp/BowerBundle"
+    "target-dir": "Sp/BowerBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.2-dev"
+        }
+    }
 }
