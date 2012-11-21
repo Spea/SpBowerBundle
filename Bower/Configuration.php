@@ -17,19 +17,43 @@ namespace Sp\BowerBundle\Bower;
 class Configuration
 {
     /**
+     * The config directory.
+     *
      * @var string
      */
     protected $directory;
 
     /**
+     * The directory where the bower dependencies should be installed to.
+     *
+     * @var string
+     */
+    protected $assetDirectory;
+
+    /**
+     * The name of the json file.
+     *
      * @var string
      */
     protected $jsonFile;
 
     /**
+     * The bower endpoint.
+     *
      * @var string
      */
     protected $endpoint;
+
+    /**
+     * Construct.
+     *
+     * @param string $directory
+     */
+    public function __construct($directory)
+    {
+        $this->directory = $directory;
+    }
+
 
     /**
      * @param string $directory
@@ -48,7 +72,22 @@ class Configuration
     }
 
     /**
-     * @param $endpoint
+     * @param string $assetDirectory
+     */
+    public function setAssetDirectory($assetDirectory)
+    {
+        $this->assetDirectory = $assetDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssetDirectory()
+    {
+        return $this->assetDirectory;
+    }
+
+    /**
      * @param string $endpoint
      */
     public function setEndpoint($endpoint)
@@ -65,7 +104,6 @@ class Configuration
     }
 
     /**
-     * @param $json
      * @param string $json
      */
     public function setJsonFile($json)
@@ -81,10 +119,13 @@ class Configuration
         return $this->jsonFile;
     }
 
+    /**
+     * @return string
+     */
     public function getJson()
     {
         $configuration = array(
-            'directory' => $this->getDirectory(),
+            'directory' => $this->getAssetDirectory(),
             'json' => $this->getJsonFile(),
             'endpoint' => $this->getEndpoint()
         );

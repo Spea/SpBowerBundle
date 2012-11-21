@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
+use Sp\BowerBundle\Bower\Configuration;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
@@ -60,15 +61,6 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
-        $this->filesystem = new Filesystem();
-        $this->filesystem->mkdir($this->target);
-    }
-
-    public function tearDown()
-    {
-        if ($this->filesystem) {
-            $this->filesystem->remove($this->target);
-        }
     }
 
     /**
@@ -77,6 +69,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInstall($configDir)
     {
+        $config = new Configuration($configDir);
         $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
@@ -84,7 +77,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
 
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
 
-        $this->bower->install($configDir);
+        $this->bower->install($config);
     }
 
     /**
@@ -93,6 +86,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     public function testCreateDependencyMappingCache()
     {
         $configDir = "/config_dir";
+        $config = new Configuration($configDir);
 
         $jsonDependencyMapping = file_get_contents(__DIR__ .'/Fixtures/dependency_mapping.json');
         $arrayDependencyMapping = require __DIR__ .'/Fixtures/dependency_mapping.php';
@@ -106,9 +100,9 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
         $this->process->expects($this->once())->method('getOutput')->will($this->returnValue($jsonDependencyMapping));
 
-        $this->cache->expects($this->once())->method('save')->with($this->equalTo($configDir), $this->equalTo($arrayDependencyMapping));
+        $this->cache->expects($this->once())->method('save')->with($this->equalTo(hash('sha1', $configDir)), $this->equalTo($arrayDependencyMapping));
 
-        $this->bower->createDependencyMappingCache($configDir);
+        $this->bower->createDependencyMappingCache($config);
     }
 
     public function componentsProvider()

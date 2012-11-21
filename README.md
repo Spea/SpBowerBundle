@@ -11,12 +11,16 @@ Features included:
 
 **Caution:** This bundle is developed in sync with [symfony's repository](https://github.com/symfony/symfony).
 
+**Note:** The configuration for this bundle slightly changed from 0.1 to 0.2, please take a look at the [upgrade notes](https://github.com/Spea/SpBowerBundle/blob/master/Upgrade.md)
+
 [![Build Status](https://secure.travis-ci.org/Spea/SpBowerBundle.png?branch=master)](https://travis-ci.org/Spea/SpBowerBundle)
 
 Documentation
 -------------
 
 [Read the Documentation for master](https://github.com/Spea/SpBowerBundle/blob/master/Resources/doc/index.md)
+
+[Read the Documentation for 0.1](https://github.com/Spea/SpBowerBundle/blob/v0.1/Resources/doc/index.md)
 
 Installation
 ------------

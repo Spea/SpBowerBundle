@@ -45,7 +45,7 @@ class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
         $configuration->setJsonFile('component.json');
         $configuration->setEndpoint('https://bower.herokuapp.com');
         $src = __DIR__ .'/Fixtures/config';
-        $configuration->setDirectory($this->filesystem->makePathRelative($this->target .'/components', $src));
+        $configuration->setAssetDirectory($this->filesystem->makePathRelative($this->target .'/components', $src));
         $this->bower->init($src, $configuration);
         $this->bower->install($src);
 

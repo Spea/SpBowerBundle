@@ -8,7 +8,7 @@ All available configuration options are listed below with their default values.
 sp_bower:
     register_assets: true # Optional
     bin: /usr/bin/bower # Optional
-    paths:
+    bundles:
         # DemoBundle: ~
         DemoBundle:
             config_dir: Resources/config/bower # Can be relative to the bundles root directory or absolute

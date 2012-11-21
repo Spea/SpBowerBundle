@@ -66,7 +66,7 @@ Enable bower dependency management for your bundles in the ```config.yml``` file
 ```yml
 # app/config/config.yml
 sp_bower:
-    paths:
+    bundles:
         YourBundle: ~
 ```
 

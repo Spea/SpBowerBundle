@@ -52,35 +52,34 @@ class Bower
      *
      * @return int
      */
-    public function install($configDir, $callback = null)
+    public function install(Configuration $config, $callback = null)
     {
-        $proc = $this->execCommand($configDir, 'install', $callback);
+        $proc = $this->execCommand($config->getDirectory(), 'install', $callback);
 
         return $proc->getExitCode();
     }
 
     /**
-     * Creates a bower configuration file (.bowerrc) in the specified directory.
+     * Creates a bower configuration file (.bowerrc) in the config directory.
      *
-     * @param string        $configDir     The directory where the configuration file (.bowerrc) should be placed.
      * @param Configuration $configuration The configuration for bower
      */
-    public function init($configDir, Configuration $configuration)
+    public function init(Configuration $configuration)
     {
-        file_put_contents($configDir.DIRECTORY_SEPARATOR.'.bowerrc', $configuration->getJson());
+        file_put_contents($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc', $configuration->getJson());
     }
 
     /**
      * Creates the cache for the dependency mapping.
      *
-     * @param string $configDir
+     * @param \Sp\BowerBundle\Bower\Configuration $config
      *
      * @throws Exception
      * @return \Sp\BowerBundle\Bower\Bower
      */
-    public function createDependencyMappingCache($configDir)
+    public function createDependencyMappingCache(Configuration $config)
     {
-        $proc = $this->execCommand($configDir, array('list', '--map'));
+        $proc = $this->execCommand($config->getDirectory(), array('list', '--map'));
         $output = $proc->getOutput();
         if (strpos($output, 'error')) {
             throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
@@ -88,7 +87,7 @@ class Bower
 
         $mapping = json_decode($output, true);
 
-        $this->cache->save($configDir, $mapping);
+        $this->cache->save($this->createCacheKey($config), $mapping);
 
         return $this;
     }
@@ -96,18 +95,18 @@ class Bower
     /**
      * Get the dependency mapping from the installed packages.
      *
-     * @param string $configDir
+     * @param Configuration $config
      *
      * @throws Exception
      * @return mixed
      */
-    public function getDependencyMapping($configDir)
+    public function getDependencyMapping(Configuration $config)
     {
-        if (!$this->cache->contains($configDir)) {
-            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $configDir));
+        if (!$this->cache->contains($config)) {
+            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config));
         }
 
-        return $this->cache->fetch($configDir);
+        return $this->cache->fetch($this->createCacheKey($config));
     }
 
     /**
@@ -128,6 +127,11 @@ class Bower
     public function setProcessBuilder(ProcessBuilder $processBuilder)
     {
         $this->processBuilder = $processBuilder;
+    }
+
+    private function createCacheKey(Configuration $config)
+    {
+        return hash("sha1", $config->getDirectory());
     }
 
     /**

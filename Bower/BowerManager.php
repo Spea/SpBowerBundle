@@ -27,7 +27,7 @@ class BowerManager
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $paths;
+    protected $bundles;
 
     /**
      * @param Bower $bower
@@ -35,24 +35,25 @@ class BowerManager
     public function __construct(Bower $bower)
     {
         $this->bower = $bower;
-        $this->paths = new ArrayCollection();
+        $this->bundles = new ArrayCollection();
     }
 
     /**
-     * @param string        $configDir
+     * @param string        $bundle
      * @param Configuration $configuration
      */
-    public function addPath($configDir, Configuration $configuration)
+    public function addBundle($bundle, Configuration $configuration)
     {
-        $this->paths->set($configDir, $configuration);
+        $this->bundles->set($bundle, $configuration);
     }
 
+
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getPaths()
+    public function getBundles()
     {
-        return $this->paths;
+        return $this->bundles;
     }
 
 }

@@ -49,14 +49,15 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContent()
     {
-        $paths = array(
-            '/foo' => new Configuration(),
+        $config = new Configuration('/foo');
+        $bundles = array(
+            'DemoBundle' => $config,
         );
 
         $arrayDependencyMapping = require __DIR__ .'/../Bower/Fixtures/dependency_mapping.php';
 
-        $this->bowerManager->expects($this->once())->method('getPaths')->will($this->returnValue($paths));
-        $this->bower->expects($this->once())->method('getDependencyMapping')->with($this->equalTo('/foo'))->will($this->returnValue($arrayDependencyMapping));
+        $this->bowerManager->expects($this->once())->method('getBundles')->will($this->returnValue($bundles));
+        $this->bower->expects($this->once())->method('getDependencyMapping')->with($this->equalTo($config))->will($this->returnValue($arrayDependencyMapping));
 
         $formulae = $this->bowerResource->getContent();
 

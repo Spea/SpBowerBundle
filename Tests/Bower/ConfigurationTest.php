@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetJsonReturnsEmptyObject()
     {
-        $config = new Configuration();
+        $config = new Configuration('/foo');
 
         $this->assertEquals('{}', $config->getJson());
     }
@@ -32,8 +32,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetJsonReturnsObject()
     {
-        $config = new Configuration();
-        $config->setDirectory('/foo');
+        $config = new Configuration('/foo');
+        $config->setAssetDirectory('/foo');
         $config->setJsonFile('foo.json');
 
         $expected = <<<json

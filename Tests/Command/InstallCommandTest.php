@@ -96,7 +96,7 @@ class InstallCommandTest extends \PHPUnit_Framework_TestCase
     public function testEmptyBowerManager()
     {
         $this->bm->expects($this->once())
-            ->method('getPaths')
+            ->method('getBundles')
             ->will($this->returnValue(array()));
 
         $this->command->run(new ArrayInput(array()), new NullOutput());
@@ -104,28 +104,28 @@ class InstallCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testInstall()
     {
-        $configuration = new Configuration();
-        $configuration->setDirectory('/test');
+        $configuration = new Configuration('/foo');
+        $configuration->setAssetDirectory('/test');
         $configuration->setJsonFile('foo.json');
 
-        $barConfig = new Configuration();
-        $paths = array(
-            '/foo' => $configuration,
-            '/bar' => $barConfig
+        $barConfig = new Configuration('/bar');
+        $bundles = array(
+            'DemoBundle' => $configuration,
+            'AcmeBundle' => $barConfig
         );
 
-        $this->bower->expects($this->at(0))->method('init')->with($this->equalTo('/foo'), $this->equalTo($configuration));
-        $this->bower->expects($this->at(1))->method('install')->with($this->equalTo('/foo'));
-        $this->bower->expects($this->at(2))->method('createDependencyMappingCache')->with($this->equalTo('/foo'));
+        $this->bower->expects($this->at(0))->method('init')->with($this->equalTo($configuration));
+        $this->bower->expects($this->at(1))->method('install')->with($this->equalTo($configuration));
+        $this->bower->expects($this->at(2))->method('createDependencyMappingCache')->with($this->equalTo($configuration));
 
-        $this->bower->expects($this->at(3))->method('init')->with($this->equalTo('/bar'), $this->equalTo($barConfig));
-        $this->bower->expects($this->at(4))->method('install')->with($this->equalTo('/bar'));
-        $this->bower->expects($this->at(5))->method('createDependencyMappingCache')->with($this->equalTo('/bar'));
+        $this->bower->expects($this->at(3))->method('init')->with($this->equalTo($barConfig));
+        $this->bower->expects($this->at(4))->method('install')->with($this->equalTo($barConfig));
+        $this->bower->expects($this->at(5))->method('createDependencyMappingCache')->with($this->equalTo($barConfig));
 
 
         $this->bm->expects($this->once())
-            ->method('getPaths')
-            ->will($this->returnValue($paths));
+            ->method('getBundles')
+            ->will($this->returnValue($bundles));
 
         $this->command->run(new ArrayInput(array()), new NullOutput());
     }

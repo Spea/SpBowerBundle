@@ -47,16 +47,16 @@ class BowerResource extends ConfigurationResource
     public function getContent()
     {
         $formulae = array();
-        foreach ($this->bowerManager->getPaths() as $configDir => $paths) {
+        foreach ($this->bowerManager->getBundles() as $config) {
             try  {
-                $mapping = $this->bower->getDependencyMapping($configDir);
+                $mapping = $this->bower->getDependencyMapping($config);
             } catch (Exception $ex) {
                 throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache');
             }
 
             foreach ($mapping as $packageName => $package) {
                 $packageName = str_replace('.', '_', $packageName);
-                $formulae = array_merge($this->createPackageFormulae($package, $packageName, $configDir), $formulae);
+                $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
             }
         }
 

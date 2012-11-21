@@ -53,7 +53,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertParameter($binPath, 'sp_bower.bower.bin');
     }
 
-    public function testLoadDefaultPaths()
+    public function testLoadDefaults()
     {
         $bundles = $this->container->getParameter('kernel.bundles');
         $bundles['DemoBundle'] = 'Fixtures\Bundles\DemoBundle\DemoBundle';
@@ -64,7 +64,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'sp_bower' => array(
-                'paths' => array(
+                'bundles' => array(
                     'DemoBundle' => array(),
                 ),
             )
@@ -76,8 +76,8 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $calls = $definition->getMethodCalls();
 
         // demo bundle assertions
-        $this->assertEquals('addPath', $calls[0][0]);
-        $this->assertEquals($demoBundlePath .'/Resources/config/bower', $calls[0][1][0]);
+        $this->assertEquals('addBundle', $calls[0][0]);
+        $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
         $this->assertEquals('../../public/components', $configCalls[0][1][0]);
@@ -85,7 +85,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
     }
 
-    public function testLoadUserPaths()
+    public function testLoadUserBundles()
     {
         $bundles = $this->container->getParameter('kernel.bundles');
         $bundles['DemoBundle'] = 'Fixtures\Bundles\DemoBundle\DemoBundle';
@@ -96,7 +96,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'sp_bower' => array(
-                'paths' => array(
+                'bundles' => array(
                     'DemoBundle' => array(
                         'config_dir' => 'Resources/config',
                         'asset_dir' => $demoBundlePath .'/Resources/public',
@@ -112,7 +112,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $this->container->getDefinition('sp_bower.bower_manager');
         $calls = $definition->getMethodCalls();
 
-        $this->assertEquals($demoBundlePath .'/Resources/config', $calls[0][1][0]);
+        $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
         $this->assertEquals('../public/', $configCalls[0][1][0]);

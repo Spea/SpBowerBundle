@@ -47,15 +47,15 @@ class SpBowerExtension extends Extension
         }
 
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
-        $this->loadPathsInformation($config['paths'], $container);
+        $this->loadBundlesInformation($config['bundles'], $container);
     }
 
-    protected function loadPathsInformation($paths, ContainerBuilder $container)
+    protected function loadBundlesInformation($bundles, ContainerBuilder $container)
     {
         $bowerManager = $container->getDefinition('sp_bower.bower_manager');
         $filesystem = new Filesystem();
 
-        foreach ($paths as $bundleName => $pathConfig) {
+        foreach ($bundles as $bundleName => $bundleConfig) {
             $bundle = null;
             foreach ($container->getParameter('kernel.bundles') as $name => $class) {
                 if ($bundleName === $name) {
@@ -70,19 +70,20 @@ class SpBowerExtension extends Extension
             }
 
             $bundleDir = dirname($bundle->getFilename());
-            if (!$filesystem->isAbsolutePath($pathConfig['config_dir'])) {
-                $pathConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$pathConfig['config_dir'];
+            if (!$filesystem->isAbsolutePath($bundleConfig['config_dir'])) {
+                $bundleConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir'];
             }
 
-            if ($filesystem->isAbsolutePath($pathConfig['asset_dir'])) {
-                $pathConfig['asset_dir'] = $filesystem->makePathRelative($pathConfig['asset_dir'], $pathConfig['config_dir']);
+            if ($filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
+                $bundleConfig['asset_dir'] = $filesystem->makePathRelative($bundleConfig['asset_dir'], $bundleConfig['config_dir']);
             }
 
             $configuration = new Definition('%sp_bower.bower.configuration.class%');
-            $configuration->addMethodCall('setDirectory', array($pathConfig['asset_dir']));
-            $configuration->addMethodCall('setJsonFile', array($pathConfig['json_file']));
-            $configuration->addMethodCall('setEndpoint', array($pathConfig['endpoint']));
-            $bowerManager->addMethodCall('addPath', array($pathConfig['config_dir'], $configuration));
+            $configuration->addArgument($bundleConfig['config_dir']);
+            $configuration->addMethodCall('setAssetDirectory', array($bundleConfig['asset_dir']));
+            $configuration->addMethodCall('setJsonFile', array($bundleConfig['json_file']));
+            $configuration->addMethodCall('setEndpoint', array($bundleConfig['endpoint']));
+            $bowerManager->addMethodCall('addBundle', array($bundleName, $configuration));
         }
     }
 

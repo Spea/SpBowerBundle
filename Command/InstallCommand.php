@@ -41,10 +41,11 @@ EOT
             $output->write($data);
         };
 
-        foreach ($bowerManager->getPaths() as $configDir => $configuration) {
-            $bower->init($configDir, $configuration);
-            $bower->install($configDir, $callback);
-            $bower->createDependencyMappingCache($configDir);
+        foreach ($bowerManager->getBundles() as $bundle => $configuration) {
+            $output->writeln(sprintf('Installing bower dependencies for <comment>"%s"</comment>', $bundle));
+            $bower->init($configuration);
+            $bower->install($configuration, $callback);
+            $bower->createDependencyMappingCache($configuration);
         }
     }
 
