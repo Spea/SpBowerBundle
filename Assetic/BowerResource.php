@@ -70,7 +70,7 @@ class BowerResource extends ConfigurationResource
      * @param string $packageName
      * @param string $configDir
      *
-     * @return array
+     * @return array<string,array<array>>
      */
     protected function createPackageFormulae(array $package, $packageName, $configDir)
     {
@@ -140,7 +140,7 @@ class BowerResource extends ConfigurationResource
      * @param string $configDir
      * @param array  $files
      *
-     * @return array<*,string>
+     * @return array
      */
     protected function resolvePaths($configDir, array $files = array())
     {

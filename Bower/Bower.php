@@ -47,7 +47,7 @@ class Bower
     /**
      * Installs bower dependencies from the given config directory.
      *
-     * @param string $config
+     * @param Configuration $config
      * @param null  $callback
      *
      * @return int

@@ -49,7 +49,7 @@ class BowerManager
 
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getBundles()
     {
