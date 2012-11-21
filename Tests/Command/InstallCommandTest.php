@@ -29,7 +29,7 @@ class InstallCommandTest extends \PHPUnit_Framework_TestCase
     private $command;
     private $bower;
     private $bm;
-    private $helperset;
+    private $helperSet;
 
     /**
      * Sets up the fixture, for example, opens a network connection.

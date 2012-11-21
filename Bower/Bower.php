@@ -102,11 +102,12 @@ class Bower
      */
     public function getDependencyMapping(Configuration $config)
     {
-        if (!$this->cache->contains($config)) {
+        $cacheKey = $this->createCacheKey($config);
+        if (!$this->cache->contains($cacheKey)) {
             throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config));
         }
 
-        return $this->cache->fetch($this->createCacheKey($config));
+        return $this->cache->fetch($cacheKey);
     }
 
     /**
