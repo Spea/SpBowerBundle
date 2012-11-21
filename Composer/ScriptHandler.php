@@ -80,7 +80,7 @@ class ScriptHandler
     }
 
     /**
-     * @return string|\Symfony\Component\Process\false
+     * @return string
      * @throws \RuntimeException
      */
     protected static function getPhp()
