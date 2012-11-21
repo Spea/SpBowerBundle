@@ -47,7 +47,7 @@ class Bower
     /**
      * Installs bower dependencies from the given config directory.
      *
-     * @param string $configDir
+     * @param string $config
      * @param null  $callback
      *
      * @return int
@@ -75,7 +75,7 @@ class Bower
      * @param \Sp\BowerBundle\Bower\Configuration $config
      *
      * @throws Exception
-     * @return \Sp\BowerBundle\Bower\Bower
+     * @return Bower
      */
     public function createDependencyMappingCache(Configuration $config)
     {
