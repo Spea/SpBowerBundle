@@ -14,10 +14,19 @@ namespace Sp\BowerBundle\Composer;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Composer\Script\Event;
 
+/**
+ * Script handler for installing bower dependencies on specific composer events.
+ *
+ * @author Francisco Facioni <fran6co@gmail.com>
+ */
 class ScriptHandler
 {
-    public static function bowerInstall($event)
+    /**
+     * @param \Composer\Script\Event $event
+     */
+    public static function bowerInstall(Event $event)
     {
         $options = self::getOptions($event);
         $appDir = $options['symfony-app-dir'];
@@ -31,7 +40,15 @@ class ScriptHandler
         static::executeCommand($event, $appDir, 'sp:bower:install', $options['process-timeout']);
     }
 
-    protected static function executeCommand($event, $appDir, $cmd, $timeout = 300)
+    /**
+     * @param \Composer\Script\Event $event
+     * @param string                 $appDir
+     * @param string                 $cmd
+     * @param int                    $timeout
+     *
+     * @throws \RuntimeException
+     */
+    protected static function executeCommand(Event $event, $appDir, $cmd, $timeout = 300)
     {
         $php = escapeshellarg(self::getPhp());
         $console = escapeshellarg($appDir.'/console');
@@ -46,7 +63,12 @@ class ScriptHandler
         }
     }
 
-    protected static function getOptions($event)
+    /**
+     * @param \Composer\Script\Event $event
+     *
+     * @return array
+     */
+    protected static function getOptions(Event $event)
     {
         $options = array_merge(array(
             'symfony-app-dir' => 'app',
@@ -57,6 +79,10 @@ class ScriptHandler
         return $options;
     }
 
+    /**
+     * @return string|\Symfony\Component\Process\false
+     * @throws \RuntimeException
+     */
     protected static function getPhp()
     {
         $phpFinder = new PhpExecutableFinder;
