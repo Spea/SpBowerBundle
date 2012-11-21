@@ -8,7 +8,7 @@ break. For the full list of changes, please look at the Changelog file.
 
 ### Configuration
 
-The configuration for this bundle changed slightly to make it more clear.
+The configuration for this bundle slightly changed to make it more clear.
 
 Before:
 
