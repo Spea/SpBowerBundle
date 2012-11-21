@@ -18,13 +18,13 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "2.1.*",
-        "symfony/process": "2.1.*",
-        "symfony/assetic-bundle": "2.1.*"
+        "symfony/framework-bundle": ">=2.1,<2.3-dev",
+        "symfony/process": ">=2.1,<2.3-dev",
+        "symfony/assetic-bundle": ">=2.1,<2.3-dev"
     },
     "require-dev":{
-        "symfony/console": ">=2.0,<2.2-dev",
-        "symfony/filesystem": "2.1.*",
+        "symfony/console": ">=2.1,<2.3-dev",
+        "symfony/filesystem": ">=2.1,<2.3-dev",
         "phpunit/phpunit": "3.7.7"
     },
     "config": {
