@@ -51,7 +51,7 @@ class BowerResource extends ConfigurationResource
             try  {
                 $mapping = $this->bower->getDependencyMapping($config);
             } catch (Exception $ex) {
-                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache');
+                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache' . $ex->getMessage());
             }
 
             foreach ($mapping as $packageName => $package) {
@@ -75,9 +75,12 @@ class BowerResource extends ConfigurationResource
     protected function createPackageFormulae(array $package, $packageName, $configDir)
     {
         $formulae = array();
-        $files = $package['source']['main'];
-        if (is_string($files)) {
-            $files = array($files);
+        $files = array();
+        if (isset($package['source']['main'])) {
+            $files = $package['source']['main'];
+            if (is_string($files)) {
+                $files = array($files);
+            }
         }
 
         $cssFiles = array();
