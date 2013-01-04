@@ -6,6 +6,7 @@ All available configuration options are listed below with their default values.
 ``` yaml
 # app/config/config.yml
 sp_bower:
+    install_on_warmup: false # Optional
     register_assets: true # Optional
     bin: /usr/bin/bower # Optional
     bundles:

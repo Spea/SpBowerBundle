@@ -21,6 +21,7 @@ Installation
 4. Installing bower dependencies
 5. Use the installed assets in your templates
 6. Add composer scripts for automatic update of dependencies
+7. Installing dependencies on every cache warmup
 
 ### Step 1: Download SpBowerBundle using composer
 
@@ -135,6 +136,16 @@ then you can use them in your templates (or wherever you need them) like this
        ]
    }
 }
+```
+
+### Step 7: Installing dependencies on every cache warmup
+
+If you want to install/update all bower dependencies during the warmup, you must set ```install_on_warmup``` to true
+
+```yml
+# app/config/config.yml
+sp_bower:
+    install_on_warmup: true
 ```
 
 ### Next Steps
