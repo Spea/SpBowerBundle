@@ -1,6 +1,5 @@
 vendor/
 composer.phar
-composer.lock
 phpunit.xml
 bin/
 .bowerrc

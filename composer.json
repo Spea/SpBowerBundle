@@ -4,7 +4,7 @@
     "description": "Handle asset dependencies with bower",
     "keywords": ["asset", "dependencies", "bower manager", "bower"],
     "license": "MIT",
-    "minimum-stability": "dev",
+    "minimum-stability": "alpha",
     "authors": [
         {
             "name": "Martin Parsiegla",
@@ -25,7 +25,7 @@
     "require-dev":{
         "symfony/console": ">=2.1,<2.3-dev",
         "symfony/filesystem": ">=2.1,<2.3-dev",
-        "phpunit/phpunit": "3.7.7"
+        "phpunit/phpunit": "3.7.*"
     },
     "config": {
         "bin-dir": "bin"
