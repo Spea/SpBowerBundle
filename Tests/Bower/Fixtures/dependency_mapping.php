@@ -20,4 +20,6 @@ return array(
             "main" => "../components/package/package.js"
         )
     ),
+    "boo_package" => array(
+    ),
 );

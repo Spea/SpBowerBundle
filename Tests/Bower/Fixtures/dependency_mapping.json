@@ -18,5 +18,8 @@
         "source": {
             "main": "../components/package/package.js"
         }
+    },
+    "boo_package": {
     }
+
 }
