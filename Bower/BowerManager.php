@@ -30,11 +30,10 @@ class BowerManager
     protected $bundles;
 
     /**
-     * @param Bower $bower
+     * Construct.
      */
-    public function __construct(Bower $bower)
+    public function __construct()
     {
-        $this->bower = $bower;
         $this->bundles = new ArrayCollection();
     }
 

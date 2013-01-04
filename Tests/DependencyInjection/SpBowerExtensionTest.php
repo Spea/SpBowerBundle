@@ -75,6 +75,10 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $this->container->getDefinition('sp_bower.bower_manager');
         $calls = $definition->getMethodCalls();
 
+        $this->assertFalse($this->container->getParameter('sp_bower.install_on_warmup'));
+        $this->assertTrue($this->container->has('sp_bower.assetic.config_loader'));
+        $this->assertTrue($this->container->has('sp_bower.assetic.bower_resource'));
+
         // demo bundle assertions
         $this->assertEquals('addBundle', $calls[0][0]);
         $this->assertEquals('DemoBundle', $calls[0][1][0]);
@@ -85,7 +89,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
     }
 
-    public function testLoadUserBundles()
+    public function testLoadUserConfig()
     {
         $bundles = $this->container->getParameter('kernel.bundles');
         $bundles['DemoBundle'] = 'Fixtures\Bundles\DemoBundle\DemoBundle';
@@ -96,6 +100,8 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $config = array(
             'sp_bower' => array(
+                'register_assets' => false,
+                'install_on_warmup' => true,
                 'bundles' => array(
                     'DemoBundle' => array(
                         'config_dir' => 'Resources/config',
@@ -108,6 +114,10 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->extension->load($config, $this->container);
+
+        $this->assertTrue($this->container->getParameter('sp_bower.install_on_warmup'));
+        $this->assertFalse($this->container->has('sp_bower.assetic.config_loader'));
+        $this->assertFalse($this->container->has('sp_bower.assetic.bower_resource'));
 
         $definition = $this->container->getDefinition('sp_bower.bower_manager');
         $calls = $definition->getMethodCalls();

@@ -54,19 +54,11 @@ class Bower
      */
     public function install(Configuration $config, $callback = null)
     {
+        $this->dumpBowerConfig($config);
         $proc = $this->execCommand($config->getDirectory(), 'install', $callback);
+        $this->deleteBowerConfig($config);
 
         return $proc->getExitCode();
-    }
-
-    /**
-     * Creates a bower configuration file (.bowerrc) in the config directory.
-     *
-     * @param Configuration $configuration The configuration for bower
-     */
-    public function init(Configuration $configuration)
-    {
-        file_put_contents($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc', $configuration->getJson());
     }
 
     /**
@@ -79,7 +71,9 @@ class Bower
      */
     public function createDependencyMappingCache(Configuration $config)
     {
+        $this->dumpBowerConfig($config);
         $proc = $this->execCommand($config->getDirectory(), array('list', '--map'));
+        $this->deleteBowerConfig($config);
         $output = $proc->getOutput();
         if (strpos($output, 'error')) {
             throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
@@ -104,7 +98,7 @@ class Bower
     {
         $cacheKey = $this->createCacheKey($config);
         if (!$this->cache->contains($cacheKey)) {
-            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config));
+            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()));
         }
 
         return $this->cache->fetch($cacheKey);
@@ -130,6 +124,33 @@ class Bower
         $this->processBuilder = $processBuilder;
     }
 
+    /**
+     * Creates a bower configuration file (.bowerrc) in the config directory.
+     *
+     * @param Configuration $configuration The configuration for bower
+     */
+    protected function dumpBowerConfig(Configuration $configuration)
+    {
+        file_put_contents($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc', $configuration->getJson());
+    }
+
+    /**
+     * Deletes the bower configuration file (.bowerrc) in the config directory.
+     *
+     * @param Configuration $configuration
+     */
+    protected function deleteBowerConfig(Configuration $configuration)
+    {
+        unlink($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc');
+    }
+
+    /**
+     * Creates a cache key for the given configuration.
+     *
+     * @param Configuration $config
+     *
+     * @return string
+     */
     private function createCacheKey(Configuration $config)
     {
         return hash("sha1", $config->getDirectory());

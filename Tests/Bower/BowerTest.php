@@ -57,7 +57,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     {
         $this->target = sys_get_temp_dir() .'/bower_install';
         $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $this->bower = new Bower($this->bin, $this->cache);
+        $this->bower = $this->getMock('Sp\BowerBundle\Bower\Bower', array('dumpBowerConfig', 'deleteBowerConfig'), array($this->bin, $this->cache));
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
@@ -74,6 +74,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->bower->expects($this->once())->method('dumpBowerConfig');
+        $this->bower->expects($this->once())->method('deleteBowerConfig');
 
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
 
@@ -96,6 +98,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->bower->expects($this->once())->method('dumpBowerConfig');
+        $this->bower->expects($this->once())->method('deleteBowerConfig');
 
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
         $this->process->expects($this->once())->method('getOutput')->will($this->returnValue($jsonDependencyMapping));

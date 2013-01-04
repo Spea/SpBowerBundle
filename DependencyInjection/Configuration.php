@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bin')->defaultValue(function() use ($finder) { return $finder->find('bower', '/usr/bin/bower'); })->end()
                 ->booleanNode('register_assets')->defaultValue(true)->end()
+                ->booleanNode('install_on_warmup')->defaultValue(false)->end()
                 ->arrayNode('bundles')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
