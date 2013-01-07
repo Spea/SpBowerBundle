@@ -115,6 +115,10 @@ then you can use them in your templates (or wherever you need them) like this
 {% endstylesheets %}
 ```
 
+**Note:**
+> Since asset names in the AsseticLibrary can not contain ```.``` or ```-``` characters, they will be
+> converted to a ```_```. So the css files from "font-awesome" must be referenced with "font_awesome_css".
+
 **Note**:
 > If you don't want this bundle to automatically register the assets, you can disable this behavior by setting
 > ```register_assets``` to false
