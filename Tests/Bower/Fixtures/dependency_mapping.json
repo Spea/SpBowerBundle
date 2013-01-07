@@ -19,6 +19,8 @@
             "main": "../components/package/package.js"
         }
     },
+    "invalid-package_name": {
+    },
     "boo_package": {
     }
 

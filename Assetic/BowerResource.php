@@ -55,7 +55,7 @@ class BowerResource extends ConfigurationResource
             }
 
             foreach ($mapping as $packageName => $package) {
-                $packageName = str_replace('.', '_', $packageName);
+                $packageName = $this->convertPackageName($packageName);
                 $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
             }
         }
@@ -87,7 +87,7 @@ class BowerResource extends ConfigurationResource
         $jsFiles = array();
         if (isset($package['dependencies'])) {
             foreach ($package['dependencies'] as $packageDependency => $value) {
-                $packageDependency = str_replace('.', '_', $packageDependency);
+                $packageDependency = $this->convertPackageName($packageDependency);
                 $jsFiles[] = '@' . $packageDependency . '_js';
                 $cssFiles[] = '@' . $packageDependency . '_css';
             }
@@ -135,6 +135,16 @@ class BowerResource extends ConfigurationResource
     protected function isStylesheet($file)
     {
         return pathinfo($file, PATHINFO_EXTENSION) == 'css';
+    }
+
+    /**
+     * @param string $packageName
+     *
+     * @return string
+     */
+    protected function convertPackageName($packageName)
+    {
+        return str_replace(array('-', '.'), '_', $packageName);
     }
 
     /**

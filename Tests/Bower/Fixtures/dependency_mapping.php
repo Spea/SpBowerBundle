@@ -20,6 +20,7 @@ return array(
             "main" => "../components/package/package.js"
         )
     ),
+    "invalid-package_name" => array(),
     "boo_package" => array(
     ),
 );

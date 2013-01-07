@@ -63,6 +63,8 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('foo_package_css', $formulae);
         $this->assertArrayHasKey('foo_package_js', $formulae);
+        $this->assertArrayHasKey('invalid_package_name_js', $formulae);
+        $this->assertArrayHasKey('invalid_package_name_css', $formulae);
         $this->assertArrayHasKey('package_css', $formulae);
         $this->assertArrayHasKey('package_js', $formulae);
 
