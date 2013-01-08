@@ -32,7 +32,8 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder(new ParameterBag(array(
             'kernel.bundles' => array(
                 'AsseticBundle' => array(),
-            )
+            ),
+            'kernel.cache_dir' => sys_get_temp_dir(),
         )));
         $this->extension = new SpBowerExtension();
     }
@@ -84,7 +85,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
-        $this->assertEquals('../../public/components', $configCalls[0][1][0]);
+        $this->assertEquals($demoBundlePath .'/Resources/config/bower/../../public/components', $configCalls[0][1][0]);
         $this->assertEquals('component.json', $configCalls[1][1][0]);
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
     }
@@ -125,7 +126,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
-        $this->assertEquals('../public/', $configCalls[0][1][0]);
+        $this->assertEquals($demoBundlePath .'/Resources/public', $configCalls[0][1][0]);
         $this->assertEquals('foo.json', $configCalls[1][1][0]);
         $this->assertEquals('https://bower.example.com', $configCalls[2][1][0]);
     }

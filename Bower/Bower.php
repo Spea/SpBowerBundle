@@ -11,6 +11,7 @@
 
 namespace Sp\BowerBundle\Bower;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\ProcessBuilder;
 use Doctrine\Common\Cache\Cache;
 
@@ -32,31 +33,36 @@ class Bower
     /**
      * @var \Doctrine\Common\Cache\Cache
      */
-    protected $cache;
+    protected $dependencyCache;
 
     /**
-     * @param string                       $bowerPath
-     * @param \Doctrine\Common\Cache\Cache $cache
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
      */
-    public function __construct($bowerPath = '/usr/bin/bower', Cache $cache)
+    protected $eventDispatcher;
+
+    /**
+     * @param string                                             $bowerPath
+     * @param \Doctrine\Common\Cache\Cache                       $dependencyCache
+     * @param \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher
+     */
+    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcher $eventDispatcher)
     {
         $this->bowerPath = $bowerPath;
-        $this->cache = $cache;
+        $this->dependencyCache = $dependencyCache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Installs bower dependencies from the given config directory.
      *
-     * @param Configuration $config
-     * @param null  $callback
+     * @param ConfigurationInterface $config
+     * @param null                   $callback
      *
      * @return int
      */
-    public function install(Configuration $config, $callback = null)
+    public function install(ConfigurationInterface $config, $callback = null)
     {
-        $this->dumpBowerConfig($config);
-        $proc = $this->execCommand($config->getDirectory(), 'install', $callback);
-        $this->deleteBowerConfig($config);
+        $proc = $this->execCommand($config, 'install', $callback);
 
         return $proc->getExitCode();
     }
@@ -69,11 +75,9 @@ class Bower
      * @throws Exception
      * @return Bower
      */
-    public function createDependencyMappingCache(Configuration $config)
+    public function createDependencyMappingCache(ConfigurationInterface $config)
     {
-        $this->dumpBowerConfig($config);
-        $proc = $this->execCommand($config->getDirectory(), array('list', '--map'));
-        $this->deleteBowerConfig($config);
+        $proc = $this->execCommand($config, array('list', '--map'));
         $output = $proc->getOutput();
         if (strpos($output, 'error')) {
             throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
@@ -81,7 +85,7 @@ class Bower
 
         $mapping = json_decode($output, true);
 
-        $this->cache->save($this->createCacheKey($config), $mapping);
+        $this->dependencyCache->save($this->createCacheKey($config), $mapping);
 
         return $this;
     }
@@ -94,14 +98,14 @@ class Bower
      * @throws Exception
      * @return mixed
      */
-    public function getDependencyMapping(Configuration $config)
+    public function getDependencyMapping(ConfigurationInterface $config)
     {
         $cacheKey = $this->createCacheKey($config);
-        if (!$this->cache->contains($cacheKey)) {
+        if (!$this->dependencyCache->contains($cacheKey)) {
             throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()));
         }
 
-        return $this->cache->fetch($cacheKey);
+        return $this->dependencyCache->fetch($cacheKey);
     }
 
     /**
@@ -127,50 +131,49 @@ class Bower
     /**
      * Creates a bower configuration file (.bowerrc) in the config directory.
      *
-     * @param Configuration $configuration The configuration for bower
+     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $configuration The configuration for bower
      */
-    protected function dumpBowerConfig(Configuration $configuration)
+    protected function dumpBowerConfig(ConfigurationInterface $configuration)
     {
-        file_put_contents($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc', $configuration->getJson());
-    }
-
-    /**
-     * Deletes the bower configuration file (.bowerrc) in the config directory.
-     *
-     * @param Configuration $configuration
-     */
-    protected function deleteBowerConfig(Configuration $configuration)
-    {
-        unlink($configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc');
+        $configFile = $configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc';
+        if (!file_exists($configFile) || file_get_contents($configFile) != $configuration->getJson()) {
+            file_put_contents($configFile, $configuration->getJson());
+        }
     }
 
     /**
      * Creates a cache key for the given configuration.
      *
-     * @param Configuration $config
+     * @param ConfigurationInterface $config
      *
      * @return string
      */
-    private function createCacheKey(Configuration $config)
+    private function createCacheKey(ConfigurationInterface $config)
     {
         return hash("sha1", $config->getDirectory());
     }
 
     /**
-     * @param string                $configDir
-     * @param string|array          $commands
+     * @param ConfigurationInterface     $config
+     * @param string|array               $commands
      * @param \Closure|string|array|null $callback
      *
      * @return \Symfony\Component\Process\Process
      */
-    private function execCommand($configDir, $commands, $callback = null)
+    private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
     {
         if (is_string($commands)) {
             $commands = array($commands);
         }
 
+        $event = new BowerEvent($config, $commands);
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
+        $config =  $event->getConfiguration();
+
+        $this->dumpBowerConfig($config);
+
         $pb = $this->getProcessBuilder();
-        $pb->setWorkingDirectory($configDir);
+        $pb->setWorkingDirectory($config->getDirectory());
         $pb->add($this->bowerPath);
         foreach ($commands as $command) {
             $pb->add($command);
@@ -178,6 +181,8 @@ class Bower
 
         $proc = $pb->getProcess();
         $proc->run($callback);
+
+        $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));
 
         return $proc;
     }

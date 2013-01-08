@@ -14,6 +14,7 @@ namespace Sp\BowerBundle\Tests\Bower;
 use Sp\BowerBundle\Bower\Bower;
 use Doctrine\Common\Cache\ArrayCache;
 use Sp\BowerBundle\Bower\Configuration;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -34,7 +35,7 @@ class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
 
         $this->target = sys_get_temp_dir() .'/bower_install_'. uniqid();
         $this->cache = new ArrayCache();
-        $this->bower = new Bower($_SERVER['BOWER_BIN'], $this->cache);
+        $this->bower = new Bower($_SERVER['BOWER_BIN'], $this->cache, new EventDispatcher());
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->target);
     }

@@ -11,6 +11,7 @@
 
 namespace Sp\BowerBundle\DependencyInjection;
 
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\Definition;
@@ -46,6 +47,19 @@ class SpBowerExtension extends Extension
             $loader->load('assetic.xml');
         }
 
+        $cacheDir = $container->getParameterBag()->resolveValue($config['cache_dir']);
+        if (!is_dir($cacheDir)) {
+            if (false === @mkdir($cacheDir, 0777, true)) {
+                throw new RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+            }
+        }
+        $container->setParameter('sp_bower.cache_dir', $cacheDir);
+
+        if (!$config['keep_bowerrc']) {
+            $execListener = $container->getDefinition('sp_bower.exec_listener');
+            $execListener->addTag('kernel.event_subscriber');
+        }
+
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
         $this->loadBundlesInformation($config['bundles'], $container);
@@ -71,12 +85,13 @@ class SpBowerExtension extends Extension
             }
 
             $bundleDir = dirname($bundle->getFilename());
+
             if (!$filesystem->isAbsolutePath($bundleConfig['config_dir'])) {
                 $bundleConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir'];
             }
 
-            if ($filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
-                $bundleConfig['asset_dir'] = $filesystem->makePathRelative($bundleConfig['asset_dir'], $bundleConfig['config_dir']);
+            if (!$filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
+                $bundleConfig['asset_dir'] = $bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir'];
             }
 
             $configuration = new Definition('%sp_bower.bower.configuration.class%');

@@ -20,11 +20,6 @@ use Doctrine\Common\Collections\Collection;
 class BowerManager
 {
     /**
-     * @var Bower
-     */
-    protected $bower;
-
-    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $bundles;
@@ -38,10 +33,10 @@ class BowerManager
     }
 
     /**
-     * @param string        $bundle
-     * @param Configuration $configuration
+     * @param string                 $bundle
+     * @param ConfigurationInterface $configuration
      */
-    public function addBundle($bundle, Configuration $configuration)
+    public function addBundle($bundle, ConfigurationInterface $configuration)
     {
         $this->bundles->set($bundle, $configuration);
     }

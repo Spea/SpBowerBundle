@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
+use Sp\BowerBundle\Bower\BowerEvents;
 use Sp\BowerBundle\Bower\Configuration;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -46,6 +47,11 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $eventDispatcher;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $process;
 
     /**
@@ -57,7 +63,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     {
         $this->target = sys_get_temp_dir() .'/bower_install';
         $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $this->bower = $this->getMock('Sp\BowerBundle\Bower\Bower', array('dumpBowerConfig', 'deleteBowerConfig'), array($this->bin, $this->cache));
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->bower = $this->getMock('Sp\BowerBundle\Bower\Bower', array('dumpBowerConfig'), array($this->bin, $this->cache, $this->eventDispatcher));
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
@@ -74,8 +81,10 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
+
         $this->bower->expects($this->once())->method('dumpBowerConfig');
-        $this->bower->expects($this->once())->method('deleteBowerConfig');
 
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
 
@@ -99,7 +108,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->bower->expects($this->once())->method('dumpBowerConfig');
-        $this->bower->expects($this->once())->method('deleteBowerConfig');
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
 
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
         $this->process->expects($this->once())->method('getOutput')->will($this->returnValue($jsonDependencyMapping));

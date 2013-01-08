@@ -14,7 +14,9 @@ namespace Sp\BowerBundle\Bower;
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class Configuration
+use Symfony\Component\Filesystem\Filesystem;
+
+class Configuration implements ConfigurationInterface
 {
     /**
      * The config directory.
@@ -124,8 +126,13 @@ class Configuration
      */
     public function getJson()
     {
+        $assetDirectory = $this->getAssetDirectory();
+        if (null !== $assetDirectory) {
+            $filesystem = new Filesystem();
+            $assetDirectory = $filesystem->makePathRelative($this->getAssetDirectory(), $this->getDirectory());
+        }
         $configuration = array(
-            'directory' => $this->getAssetDirectory(),
+            'directory' => $assetDirectory,
             'json' => $this->getJsonFile(),
             'endpoint' => $this->getEndpoint()
         );

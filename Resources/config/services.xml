@@ -14,6 +14,7 @@
         <parameter key="sp_bower.directory_resource.class">Symfony\Component\Config\Resource\DirectoryResource</parameter>
         <parameter key="sp_bower.filesystem_cache.class">Doctrine\Common\Cache\FilesystemCache</parameter>
         <parameter key="sp_bower.dependency_cache_warmer.class">Sp\BowerBundle\CacheWarmer\DependencyCacheWarmer</parameter>
+        <parameter key="sp_bower.exec_listener.class">Sp\BowerBundle\EventListener\ExecListener</parameter>
     </parameters>
 
     <services>
@@ -30,9 +31,14 @@
             <argument>%sp_bower.install_on_warmup%</argument>
         </service>
 
+        <service id="sp_bower.exec_listener" class="%sp_bower.exec_listener.class%">
+            <argument>%sp_bower.cache_dir%</argument>
+        </service>
+
         <service id="sp_bower.bower" class="%sp_bower.bower.class%">
             <argument>%sp_bower.bower.bin%</argument>
             <argument type="service" id="sp_bower.filesystem_cache" />
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="sp_bower.bower_manager" class="%sp_bower.bower_manager.class%" />
