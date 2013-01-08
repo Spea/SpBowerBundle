@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.4-dev
+
+...
+
 ### 0.3 (2013-01-08)
 
 * Fixed an error when the package didn't defined any source files
