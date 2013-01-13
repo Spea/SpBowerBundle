@@ -19,6 +19,7 @@ interface ConfigurationInterface
 
     /**
      * @param string $directory
+     * @return void
      */
     public function setDirectory($directory);
 
@@ -29,6 +30,7 @@ interface ConfigurationInterface
 
     /**
      * @param string $assetDirectory
+     * @return void
      */
     public function setAssetDirectory($assetDirectory);
 
@@ -39,6 +41,7 @@ interface ConfigurationInterface
 
     /**
      * @param string $json
+     * @return void
      */
     public function setJsonFile($json);
 
