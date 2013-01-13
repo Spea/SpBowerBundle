@@ -42,7 +42,7 @@ class BowerManager
     }
 
     /**
-     * @return Collection
+     * @return ArrayCollection
      */
     public function getBundles()
     {
