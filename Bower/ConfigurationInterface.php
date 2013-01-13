@@ -20,35 +20,35 @@ interface ConfigurationInterface
     /**
      * @param string $directory
      */
-    function setDirectory($directory);
+    public function setDirectory($directory);
 
     /**
      * @return string
      */
-    function getDirectory();
+    public function getDirectory();
 
     /**
      * @param string $assetDirectory
      */
-    function setAssetDirectory($assetDirectory);
+    public function setAssetDirectory($assetDirectory);
 
     /**
      * @return string
      */
-    function getAssetDirectory();
+    public function getAssetDirectory();
 
     /**
      * @param string $json
      */
-    function setJsonFile($json);
+    public function setJsonFile($json);
 
     /**
      * @return string
      */
-    function getJsonFile();
+    public function getJsonFile();
 
     /**
      * @return string
      */
-    function getJson();
+    public function getJson();
 }

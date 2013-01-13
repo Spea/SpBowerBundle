@@ -48,7 +48,7 @@ class BowerResource extends ConfigurationResource
     {
         $formulae = array();
         foreach ($this->bowerManager->getBundles() as $config) {
-            try  {
+            try {
                 $mapping = $this->bower->getDependencyMapping($config);
             } catch (Exception $ex) {
                 throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache' . $ex->getMessage());

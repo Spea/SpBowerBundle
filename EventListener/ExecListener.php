@@ -37,7 +37,7 @@ class ExecListener implements EventSubscriberInterface
 
         $filesystem = new Filesystem();
         $filesystem->copy(
-            $config->getDirectory() .DIRECTORY_SEPARATOR.$config->getJsonFile(),
+            $config->getDirectory().DIRECTORY_SEPARATOR.$config->getJsonFile(),
             $tmpConfig->getDirectory().DIRECTORY_SEPARATOR.$tmpConfig->getJsonFile(),
             true
         );

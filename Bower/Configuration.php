@@ -11,11 +11,11 @@
 
 namespace Sp\BowerBundle\Bower;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-use Symfony\Component\Filesystem\Filesystem;
-
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -55,7 +55,6 @@ class Configuration implements ConfigurationInterface
     {
         $this->directory = $directory;
     }
-
 
     /**
      * @param string $directory

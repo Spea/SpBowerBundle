@@ -41,7 +41,6 @@ class BowerManager
         $this->bundles->set($bundle, $configuration);
     }
 
-
     /**
      * @return Collection
      */

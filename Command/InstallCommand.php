@@ -37,7 +37,7 @@ EOT
     {
         $bowerManager = $this->getBowerManager();
         $bower = $this->getBower();
-        $callback = function($type, $data) use($output) {
+        $callback = function($type, $data) use ($output) {
             $output->write($data);
         };
 
