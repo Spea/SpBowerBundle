@@ -121,7 +121,7 @@ then you can use them in your templates (or wherever you need them) like this
 
 **Note**:
 > If you don't want this bundle to automatically register the assets, you can disable this behavior by setting
-> ```register_assets``` to false
+> ```assetic``` to false
 
 **Warning**:
 > Your site may be slowed down if you enabled ```use_controller``` in the assetic bundle and
@@ -155,3 +155,4 @@ sp_bower:
 ### Next Steps
 
 - [Configuration Reference](configuration_reference.md)
+- [Assetic Filters](assetic_filters.md)

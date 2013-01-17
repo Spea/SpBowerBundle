@@ -8,8 +8,21 @@ All available configuration options are listed below with their default values.
 sp_bower:
     install_on_warmup: false # Optional
     keep_bowerrc: false # Optional
-    register_assets: true # Optional
     bin: /usr/bin/bower # Optional
+    # assetic: ~
+    assetic:
+        enabled: true
+        filters:
+            css:
+                - ?yui_css
+            js:
+                - ?uglifyjs
+            packages:
+                bootstrap:
+                    css:
+                        - cssrewrite
+                    js:
+                        - ?yui_js
     bundles:
         # DemoBundle: ~
         DemoBundle:
