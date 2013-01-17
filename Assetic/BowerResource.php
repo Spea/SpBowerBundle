@@ -32,6 +32,26 @@ class BowerResource extends ConfigurationResource
     protected $bowerManager;
 
     /**
+     * @var array
+     */
+    protected $cssFilters = array();
+
+    /**
+     * @var array
+     */
+    protected $jsFilters = array();
+
+    /**
+     * @var array
+     */
+    protected $packageCssFilters = array();
+
+    /**
+     * @var array
+     */
+    protected $packageJsFilters = array();
+
+    /**
      * @param \Sp\BowerBundle\Bower\Bower        $bower
      * @param \Sp\BowerBundle\Bower\BowerManager $bowerManager
      */
@@ -61,6 +81,112 @@ class BowerResource extends ConfigurationResource
         }
 
         return $formulae;
+    }
+
+    /**
+     * @param array $cssFilter
+     */
+    public function setCssFilters(array $cssFilter)
+    {
+        $this->cssFilters = $cssFilter;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCssFilters()
+    {
+        return $this->cssFilters;
+    }
+
+    /**
+     * @param array $jsFilter
+     */
+    public function setJsFilters(array $jsFilter)
+    {
+        $this->jsFilters = $jsFilter;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJsFilters()
+    {
+        return $this->jsFilters;
+    }
+
+    /**
+     * @param array $packageCssFilters
+     *
+     * @return $this
+     */
+    public function setPackageCssFilters(array $packageCssFilters)
+    {
+        $this->packageCssFilters = $packageCssFilters;
+
+        return $this;
+    }
+
+    /**
+     * @param string $packageName
+     * @param array  $filters
+     *
+     * @return $this
+     */
+    public function addPackageCssFilters($packageName, array $filters)
+    {
+        $this->packageCssFilters[$packageName] = $filters;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPackageCssFilters()
+    {
+        return $this->packageCssFilters;
+    }
+
+    /**
+     * @param array $packageJsFilters
+     *
+     * @return $this
+     */
+    public function setPackageJsFilters(array $packageJsFilters)
+    {
+        $this->packageJsFilters = $packageJsFilters;
+
+        return $this;
+    }
+
+    /**
+     * @param string $packageName
+     * @param array  $filters
+     *
+     * @return $this
+     */
+    public function addPackageJsFilters($packageName, array $filters)
+    {
+        $this->packageJsFilters[$packageName] = $filters;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPackageJsFilters()
+    {
+        return $this->packageJsFilters;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'bower';
     }
 
     /**
@@ -106,15 +232,31 @@ class BowerResource extends ConfigurationResource
         $cssFiles = $this->resolvePaths($configDir, $cssFiles);
         $jsFiles = $this->resolvePaths($configDir, $jsFiles);
 
-        $formulae[$packageName . '_css'] = array($cssFiles, array(), array());
-        $formulae[$packageName . '_js'] = array($jsFiles, array(), array());
+        $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageName), array());
+        $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageName), array());
+        $this->getJsFilters();
 
         return $formulae;
     }
 
-    public function __toString()
+    protected function resolveCssFilters($packageName)
     {
-        return 'bower';
+        $cssFilters = $this->getCssFilters();
+        if (isset($this->packageCssFilters[$packageName])) {
+            $cssFilters = array_merge($cssFilters, $this->packageCssFilters[$packageName]);
+        }
+
+        return $cssFilters;
+    }
+
+    protected function resolveJsFilters($packageName)
+    {
+        $jsFilters = $this->getJsFilters();
+        if (isset($this->packageJsFilters[$packageName])) {
+            $jsFilters = array_merge($jsFilters, $this->packageJsFilters[$packageName]);
+        }
+
+        return $jsFilters;
     }
 
     /**

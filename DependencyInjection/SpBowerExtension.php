@@ -38,13 +38,10 @@ class SpBowerExtension extends Extension
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        if ($config['register_assets']) {
-            $bundles = $container->getParameter('kernel.bundles');
-            if (!isset($bundles['AsseticBundle'])) {
-                throw new \RuntimeException('The SpBowerBundle requires the AsseticBundle, please make sure to enable it in your AppKernel.');
-            }
-
-            $loader->load('assetic.xml');
+        $registerAssets = $config['register_assets'];
+        $registerAssets = (isset($config['assetic'])) ? $config['assetic']['enabled'] : $registerAssets;
+        if ($registerAssets) {
+            $this->registerAsseticConfiguration($config, $container, $loader);
         }
 
         $cacheDir = $container->getParameterBag()->resolveValue($config['cache_dir']);
@@ -53,8 +50,8 @@ class SpBowerExtension extends Extension
                 throw new RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
             }
         }
-        $container->setParameter('sp_bower.cache_dir', $cacheDir);
 
+        $container->setParameter('sp_bower.cache_dir', $cacheDir);
         if (!$config['keep_bowerrc']) {
             $execListener = $container->getDefinition('sp_bower.exec_listener');
             $execListener->addTag('kernel.event_subscriber');
@@ -63,6 +60,35 @@ class SpBowerExtension extends Extension
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
         $this->loadBundlesInformation($config['bundles'], $container);
+    }
+
+    /**
+     * @param array                                                       $config
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder     $container
+     * @param \Symfony\Component\DependencyInjection\Loader\XmlFileLoader $loader
+     *
+     * @throws \RuntimeException
+     */
+    protected function registerAsseticConfiguration(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+        if (!isset($bundles['AsseticBundle'])) {
+            throw new \RuntimeException('The SpBowerBundle requires the AsseticBundle, please make sure to enable it in your AppKernel.');
+        }
+
+        $loader->load('assetic.xml');
+
+        if (!isset($config['assetic'])) {
+            return;
+        }
+
+        $resourceDefinition = $container->getDefinition('sp_bower.assetic.bower_resource');
+        $resourceDefinition->addMethodCall('setJsFilters', array($config['assetic']['filters']['js']));
+        $resourceDefinition->addMethodCall('setCssFilters', array($config['assetic']['filters']['css']));
+        foreach ($config['assetic']['filters']['packages'] as $packageName => $filters) {
+            $resourceDefinition->addMethodCall('addPackageCssFilters', array($packageName, $filters['css']));
+            $resourceDefinition->addMethodCall('addPackageJsFilters', array($packageName, $filters['js']));
+        }
     }
 
     protected function loadBundlesInformation($bundles, ContainerBuilder $container)
