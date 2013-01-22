@@ -62,30 +62,29 @@ class Bower
      */
     public function install(ConfigurationInterface $config, $callback = null)
     {
-        $proc = $this->execCommand($config, 'install', $callback);
+        $result = $this->execCommand($config, 'install', $callback);
 
-        return $proc->getExitCode();
+        return $result->getProcess()->getExitCode();
     }
 
     /**
      * Creates the cache for the dependency mapping.
      *
-     * @param \Sp\BowerBundle\Bower\Configuration $config
+     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
      * @throws Exception
      * @return Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
     {
-        $proc = $this->execCommand($config, array('list', '--map'));
-        $output = $proc->getOutput();
+        $result = $this->execCommand($config, array('list', '--map'));
+        $output = $result->getProcess()->getOutput();
         if (strpos($output, 'error')) {
             throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
         }
 
         $mapping = json_decode($output, true);
-
-        $this->dependencyCache->save($this->createCacheKey($config), $mapping);
+        $this->dependencyCache->save($this->createCacheKey($result->getConfig()), $mapping);
 
         return $this;
     }
@@ -93,19 +92,41 @@ class Bower
     /**
      * Get the dependency mapping from the installed packages.
      *
-     * @param Configuration $config
+     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
      * @throws Exception
      * @return mixed
      */
     public function getDependencyMapping(ConfigurationInterface $config)
     {
+        $event = new BowerEvent($config, array());
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
+        $config =  $event->getConfiguration();
+
         $cacheKey = $this->createCacheKey($config);
         if (!$this->dependencyCache->contains($cacheKey)) {
             throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()));
         }
 
-        return $this->dependencyCache->fetch($cacheKey);
+        $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, array()));
+
+        $mapping = $this->dependencyCache->fetch($cacheKey);
+
+        // Make sure to have an absolute path for all sources.
+        foreach ($mapping as $packageName => $package) {
+            if (isset($package['source']['main'])) {
+                $files = $package['source']['main'];
+                if (is_string($files)) {
+                    $mapping[$packageName]['source']['main']  = $this->resolvePath($config->getDirectory(), $files);
+                } else {
+                    foreach ($files as $key => $source) {
+                        $mapping[$packageName]['source']['main'][$key] = $this->resolvePath($config->getDirectory(), $source);
+                    }
+                }
+            }
+        }
+
+        return $mapping;
     }
 
     /**
@@ -158,7 +179,7 @@ class Bower
      * @param string|array               $commands
      * @param \Closure|string|array|null $callback
      *
-     * @return \Symfony\Component\Process\Process
+     * @return \Sp\BowerBundle\Bower\BowerResult
      */
     private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
     {
@@ -184,6 +205,24 @@ class Bower
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));
 
-        return $proc;
+        return new BowerResult($proc, $config);
+    }
+
+    /**
+     * Creates an absolute path for all passed files based on the config directory..
+     *
+     * @param string $configDir
+     * @param string $file
+     *
+     * @return array
+     */
+    protected function resolvePath($configDir, $file)
+    {
+        chdir($configDir);
+        if (strpos($file, '@') === 0) {
+            return $file;
+        }
+
+        return realpath($file);
     }
 }

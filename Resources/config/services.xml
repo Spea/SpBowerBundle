@@ -15,6 +15,7 @@
         <parameter key="sp_bower.filesystem_cache.class">Doctrine\Common\Cache\FilesystemCache</parameter>
         <parameter key="sp_bower.dependency_cache_warmer.class">Sp\BowerBundle\CacheWarmer\DependencyCacheWarmer</parameter>
         <parameter key="sp_bower.exec_listener.class">Sp\BowerBundle\EventListener\ExecListener</parameter>
+        <parameter key="sp_bower.cache_create_listener.class">Sp\BowerBundle\EventListener\CacheCreateListener</parameter>
     </parameters>
 
     <services>
@@ -33,6 +34,11 @@
 
         <service id="sp_bower.exec_listener" class="%sp_bower.exec_listener.class%">
             <argument>%sp_bower.cache_dir%</argument>
+        </service>
+
+        <service id="sp_bower.cache_create_listener" class="%sp_bower.cache_create_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="sp_bower.bower" />
         </service>
 
         <service id="sp_bower.bower" class="%sp_bower.bower.class%">

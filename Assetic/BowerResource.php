@@ -229,9 +229,6 @@ class BowerResource extends ConfigurationResource
             }
         }
 
-        $cssFiles = $this->resolvePaths($configDir, $cssFiles);
-        $jsFiles = $this->resolvePaths($configDir, $jsFiles);
-
         $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageName), array());
         $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageName), array());
         $this->getJsFilters();
@@ -287,26 +284,5 @@ class BowerResource extends ConfigurationResource
     protected function convertPackageName($packageName)
     {
         return str_replace(array('-', '.'), '_', $packageName);
-    }
-
-    /**
-     * Creates an absolute path for all passed files based on the config directory..
-     *
-     * @param string $configDir
-     * @param array  $files
-     *
-     * @return array
-     */
-    protected function resolvePaths($configDir, array $files = array())
-    {
-        chdir($configDir);
-        foreach ($files as $key => $file) {
-            if (strpos($file, '@') === 0) {
-                continue;
-            }
-            $files[$key] = realpath($file);
-        }
-
-        return $files;
     }
 }

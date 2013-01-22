@@ -44,7 +44,6 @@ EOT
         foreach ($bowerManager->getBundles() as $bundle => $configuration) {
             $output->writeln(sprintf('Installing bower dependencies for <comment>"%s"</comment> into <comment>"%s"</comment>', $bundle, $configuration->getAssetDirectory()));
             $bower->install($configuration, $callback);
-            $bower->createDependencyMappingCache($configuration);
         }
     }
 

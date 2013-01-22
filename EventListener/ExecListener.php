@@ -30,6 +30,10 @@ class ExecListener implements EventSubscriberInterface
      */
     public function onPreExec(BowerEvent $event)
     {
+        if ($event->getConfiguration()->getDirectory() == $this->cacheDir) {
+            return;
+        }
+
         $config = $event->getConfiguration();
 
         $tmpConfig = clone $config;
@@ -51,7 +55,7 @@ class ExecListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            BowerEvents::PRE_EXEC => array('onPreExec'),
+            BowerEvents::PRE_EXEC => array('onPreExec', 10),
         );
     }
 
