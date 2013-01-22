@@ -179,7 +179,7 @@ class Bower
      * @param string|array               $commands
      * @param \Closure|string|array|null $callback
      *
-     * @return \Sp\BowerBundle\Bower\BowerResult
+     * @return BowerResult
      */
     private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
     {
@@ -214,7 +214,7 @@ class Bower
      * @param string $configDir
      * @param string $file
      *
-     * @return array
+     * @return string
      */
     protected function resolvePath($configDir, $file)
     {
