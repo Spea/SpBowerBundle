@@ -236,6 +236,9 @@ class BowerResource extends ConfigurationResource
         return $formulae;
     }
 
+    /**
+     * @param string $packageName
+     */
     protected function resolveCssFilters($packageName)
     {
         $cssFilters = $this->getCssFilters();
@@ -246,6 +249,9 @@ class BowerResource extends ConfigurationResource
         return $cssFilters;
     }
 
+    /**
+     * @param string $packageName
+     */
     protected function resolveJsFilters($packageName)
     {
         $jsFilters = $this->getJsFilters();
