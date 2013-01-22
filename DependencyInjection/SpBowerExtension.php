@@ -134,8 +134,6 @@ class SpBowerExtension extends Extension
         foreach ($container->getParameter('kernel.bundles') as $name => $class) {
             if ($bundleName === $name) {
                 return new \ReflectionClass($class);
-
-                break;
             }
         }
 
