@@ -47,7 +47,7 @@ class BowerResult
     }
 
     /**
-     * @return \Symfony\Component\Process\Process
+     * @return Process
      */
     public function getProcess()
     {
