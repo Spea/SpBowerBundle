@@ -97,25 +97,19 @@ class SpBowerExtension extends Extension
         $filesystem = new Filesystem();
 
         foreach ($bundles as $bundleName => $bundleConfig) {
-            $bundle = null;
-            foreach ($container->getParameter('kernel.bundles') as $name => $class) {
-                if ($bundleName === $name) {
-                    $bundle = new \ReflectionClass($class);
-
-                    break;
-                }
-            }
-
+            $bundle = $this->getBundleReflectionClass($container, $bundleName);
             if (null === $bundle) {
                 throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $bundleName));
             }
 
             $bundleDir = dirname($bundle->getFilename());
 
+            $bundleConfig['config_dir'] = $this->parseDirectory($container, $bundleConfig['config_dir']);
             if (!$filesystem->isAbsolutePath($bundleConfig['config_dir'])) {
                 $bundleConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir'];
             }
 
+            $bundleConfig['asset_dir'] = $this->parseDirectory($container, $bundleConfig['asset_dir']);
             if (!$filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
                 $bundleConfig['asset_dir'] = $bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir'];
             }
@@ -129,11 +123,47 @@ class SpBowerExtension extends Extension
         }
     }
 
-    private function createDirectoryResourceDefinition($src)
+    /**
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param                                                         $bundleName
+     *
+     * @return null|\ReflectionClass
+     */
+    private function getBundleReflectionClass(ContainerBuilder $container, $bundleName)
     {
-        $definition = new Definition('%sp_bower.directory_resource.class%', array($src));
+        foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+            if ($bundleName === $name) {
+                return new \ReflectionClass($class);
 
-        return $definition;
+                break;
+            }
+        }
+
+        return null;
     }
 
+    /**
+     * Convert possible bundle notations.
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param string                                                  $directory
+     *
+     * @return mixed
+     */
+    private function parseDirectory(ContainerBuilder $container, $directory)
+    {
+        // expand bundle notation
+        if ('@' == $directory[0] && false !== strpos($directory, '/')) {
+            // use the bundle path as this asset's root
+            $bundleName = substr($directory, 1);
+            if (false !== $pos = strpos($bundleName, '/')) {
+                $bundleName = substr($bundleName, 0, $pos);
+            }
+
+            $bundlePath = dirname($this->getBundleReflectionClass($container, $bundleName)->getFileName());
+            $directory = str_replace('@'. $bundleName, $bundlePath, $directory);
+        }
+
+        return $directory;
+    }
 }

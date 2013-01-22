@@ -132,6 +132,31 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($resourceCalls[3][1][1], $jsPackageFilters);
     }
 
+    public function testBundleAnnotation()
+    {
+        $config = array(
+            'sp_bower' => array(
+                'bundles' => array(
+                    'DemoBundle' => array(
+                        'config_dir' => '@DemoBundle/config',
+                        'asset_dir' => '@DemoBundle/assets',
+                    ),
+                ),
+            )
+        );
+
+        $this->extension->load($config, $this->container);
+
+        $definition = $this->container->getDefinition('sp_bower.bower_manager');
+        $calls = $definition->getMethodCalls();
+
+        // demo bundle assertions
+        $configDefinition = $calls[0][1][1];
+        $configCalls = $configDefinition->getMethodCalls();
+        $this->assertEquals($this->demoBundlePath .'/assets', $configCalls[0][1][0]);
+        $this->assertEquals($this->demoBundlePath .'/config', $configDefinition->getArgument(0));
+    }
+
     public function testLoadUserConfig()
     {
         $config = array(
