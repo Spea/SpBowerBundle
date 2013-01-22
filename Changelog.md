@@ -1,7 +1,7 @@
 Changelog
 =========
 
-### 0.4-dev
+### 0.4 (2013-01-22)
 
 * Added possiblity to add assetic filters to all (or some) bower packages
 * Deprecated the configuration option ```register_assets```. More on that can be found in the [upgrade instructions](Upgrade.md)
