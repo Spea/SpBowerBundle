@@ -107,7 +107,7 @@ then you can use them in your templates (or wherever you need them) like this
 ```twig
 {% javascripts
     "@bootstrap_js" %}
-    <link rel="stylesheet" href="{{ asset_url }}" />
+    <script src="{{ asset_url }}"></script>
 {% endjavascripts %}
 {% stylesheets
     "@bootstrap_css" %}

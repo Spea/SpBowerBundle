@@ -3,8 +3,11 @@ Changelog
 
 ### 0.4-dev
 
-* Added possiblity to add assetic filters to all (or some) bower packages.
+* Added possiblity to add assetic filters to all (or some) bower packages
 * Deprecated the configuration option ```register_assets```. More on that can be found in the [upgrade instructions](Upgrade.md)
+* Added bundle notation support for the ```config_dir``` and ```asset_dir``` option
+* Fixed a bug where asset paths were not resolved correctly when using a temporary .bowerrc file
+* Install command now shows the directory where the assets will be installed to
 
 ### 0.3 (2013-01-08)
 
