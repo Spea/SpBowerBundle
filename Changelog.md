@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.5-dev
+
+...
+
 ### 0.4 (2013-01-22)
 
 * Added possiblity to add assetic filters to all (or some) bower packages
