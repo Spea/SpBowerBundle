@@ -126,6 +126,7 @@ class SpBowerExtension extends Extension
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param                                                         $bundleName
+     * @param integer|string $bundleName
      *
      * @return null|\ReflectionClass
      */
@@ -146,7 +147,7 @@ class SpBowerExtension extends Extension
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string                                                  $directory
      *
-     * @return mixed
+     * @return string
      */
     private function parseDirectory(ContainerBuilder $container, $directory)
     {
