@@ -57,15 +57,17 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $directory
+     * {@inheritdoc}
      */
     public function setDirectory($directory)
     {
         $this->directory = $directory;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getDirectory()
     {
@@ -73,11 +75,13 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $assetDirectory
+     * {@inheritdoc}
      */
     public function setAssetDirectory($assetDirectory)
     {
         $this->assetDirectory = $assetDirectory;
+
+        return $this;
     }
 
     /**
@@ -89,7 +93,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $endpoint
+     * {@inheritdoc}
      */
     public function setEndpoint($endpoint)
     {
@@ -97,7 +101,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getEndpoint()
     {
@@ -105,7 +109,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $json
+     * {@inheritdoc}
      */
     public function setJsonFile($json)
     {
@@ -113,7 +117,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getJsonFile()
     {
@@ -121,7 +125,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getJson()
     {
