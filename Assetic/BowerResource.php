@@ -15,11 +15,12 @@ use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
 use Sp\BowerBundle\Bower\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\Bower;
+use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class BowerResource extends ConfigurationResource
+class BowerResource extends ConfigurationResource implements \Serializable
 {
     /**
      * @var \Sp\BowerBundle\Bower\Bower
@@ -290,5 +291,21 @@ class BowerResource extends ConfigurationResource
     protected function convertPackageName($packageName)
     {
         return str_replace(array('-', '.'), '_', $packageName);
+    }
+
+    /**
+     * @return string
+     */
+    public function serialize()
+    {
+        return serialize(array($this->cssFilters, $this->jsFilters, $this->packageJsFilters, $this->packageCssFilters));
+    }
+
+    /**
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        list($this->cssFilters, $this->jsFilter, $this->packageJsFilters, $this->packageCssFilters) = unserialize($serialized);
     }
 }
