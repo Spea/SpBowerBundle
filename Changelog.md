@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.6-dev
+
+...
+
 ### 0.5 (2013-03-14)
 
 * Fixed a serializer issue when ```use_controller``` were enabled
