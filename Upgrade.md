@@ -10,7 +10,7 @@ break. For the full list of changes, please look at the Changelog file.
 
 #### Deprecations
 
-The configuration option ```register_assets``` is deprecated and will be removed in 0.5.
+The configuration option ```register_assets``` is deprecated and will be removed in 0.6.
 You should now use the ```assetic``` option
 
 Before:
