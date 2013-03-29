@@ -14,6 +14,6 @@ namespace Sp\BowerBundle\Bower;
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class Exception extends \Exception
+class FileNotFoundException extends Exception
 {
 }

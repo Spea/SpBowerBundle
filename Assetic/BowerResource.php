@@ -11,6 +11,7 @@
 
 namespace Sp\BowerBundle\Assetic;
 
+use Sp\BowerBundle\Bower\FileNotFoundException;
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
 use Sp\BowerBundle\Bower\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
@@ -71,8 +72,10 @@ class BowerResource extends ConfigurationResource implements \Serializable
         foreach ($this->bowerManager->getBundles() as $config) {
             try {
                 $mapping = $this->bower->getDependencyMapping($config);
+            } catch(FileNotFoundException $ex) {
+                throw $ex;
             } catch (Exception $ex) {
-                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache' . $ex->getMessage());
+                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
             }
 
             foreach ($mapping as $packageName => $package) {

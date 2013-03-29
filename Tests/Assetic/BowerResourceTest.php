@@ -38,17 +38,12 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->bower = $this->getMockBuilder('Sp\BowerBundle\Bower\Bower')->disableOriginalConstructor()->getMock();
         $this->bowerManager = $this->getMockBuilder('Sp\BowerBundle\Bower\BowerManager')->disableOriginalConstructor()->getMock();
-        $this->bowerResource = $this->getMock('Sp\BowerBundle\Assetic\BowerResource', array('resolvePaths'), array($this->bower, $this->bowerManager));
-        $this->bowerResource->expects($this->any())->method('resolvePaths')->will($this->returnCallback(function ($configDir, $files) {
-            return $files;
-        }));
+        $this->bowerResource = new BowerResource($this->bower, $this->bowerManager);
 
         $config = new Configuration('/foo');
         $bundles = array(
             'DemoBundle' => $config,
         );
-
-
 
         $arrayDependencyMapping = require __DIR__ .'/../Bower/Fixtures/dependency_mapping.php';
 

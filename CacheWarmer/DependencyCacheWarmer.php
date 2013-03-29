@@ -63,9 +63,9 @@ class DependencyCacheWarmer implements CacheWarmerInterface
         foreach ($this->bowerManager->getBundles() as $bundle => $config) {
             if ($this->install) {
                 $this->bower->install($config);
+            } else {
+                $this->bower->createDependencyMappingCache($config);
             }
-
-            $this->bower->createDependencyMappingCache($config);
         }
     }
 }

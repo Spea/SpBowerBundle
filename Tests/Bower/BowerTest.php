@@ -119,6 +119,64 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->bower->createDependencyMappingCache($config);
     }
 
+    public function testCreateDependencyMappingCacheWithInvalidMapping()
+    {
+        $configDir = "/config_dir";
+        $config = new Configuration($configDir);
+
+        $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
+        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('list'));
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
+        $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->bower->expects($this->once())->method('dumpBowerConfig');
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
+
+        $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
+        $this->process->expects($this->once())->method('getOutput')->will($this->returnValue(""));
+
+        $this->cache->expects($this->never())->method('save');
+        $this->cache->expects($this->once())->method('delete')->with($this->equalTo(hash('sha1', $configDir)));
+
+        $this->bower->createDependencyMappingCache($config);
+    }
+
+    public function testGetDependencyMapping()
+    {
+        $configDir = __DIR__ ."/Fixtures/config";
+        $config = new Configuration($configDir);
+        $arrayDependencyMapping = require __DIR__ .'/Fixtures/simple_dependency_mapping.php';
+
+        $this->cache->expects($this->once())->method('contains')->will($this->returnValue(true));
+        $this->cache->expects($this->once())->method('fetch')->will($this->returnValue($arrayDependencyMapping));
+
+        $mapping = $this->bower->getDependencyMapping($config);
+        $this->assertCount(1, $mapping);
+        $this->assertArrayHasKey('source', $mapping['simple_package']);
+        $this->assertArrayHasKey('main', $mapping['simple_package']['source']);
+        $source = $mapping['simple_package']['source'];
+        $this->assertCount(3, $source['main']);
+        $this->assertEquals(__DIR__ ."/Fixtures/components/simple_package/styles.css", $source['main'][0]);
+        $this->assertEquals(__DIR__ ."/Fixtures/components/simple_package/script.js", $source['main'][1]);
+        $this->assertEquals("", $source['main'][2]);
+    }
+
+    /**
+     * @expectedException \Sp\BowerBundle\Bower\FileNotFoundException
+     */
+    public function testGetDependencyMappingThrowsFileNotFoundException()
+    {
+        $configDir = __DIR__ ."/Fixtures/config";
+        $config = new Configuration($configDir);
+        $arrayDependencyMapping = require __DIR__ .'/Fixtures/dependency_mapping.php';
+
+        $this->cache->expects($this->once())->method('contains')->will($this->returnValue(true));
+        $this->cache->expects($this->once())->method('fetch')->will($this->returnValue($arrayDependencyMapping));
+
+        $this->bower->getDependencyMapping($config);
+    }
+
     public function componentsProvider()
     {
         return array(

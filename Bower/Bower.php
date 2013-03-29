@@ -84,7 +84,14 @@ class Bower
         }
 
         $mapping = json_decode($output, true);
-        $this->dependencyCache->save($this->createCacheKey($result->getConfig()), $mapping);
+        $cacheKey = $this->createCacheKey($result->getConfig());
+        if (null === $mapping) {
+            $this->dependencyCache->delete($cacheKey);
+
+            return $this;
+        }
+
+        $this->dependencyCache->save($cacheKey, $mapping);
 
         return $this;
     }
@@ -214,6 +221,7 @@ class Bower
      * @param string $configDir
      * @param string $file
      *
+     * @throws FileNotFoundException
      * @return string
      */
     protected function resolvePath($configDir, $file)
@@ -223,6 +231,13 @@ class Bower
             return $file;
         }
 
-        return realpath($file);
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if (!file_exists($file) && in_array($extension, array('json', 'css'))) {
+            throw new FileNotFoundException(
+                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $configDir ."/".$file)
+            );
+        }
+
+        return realpath($file) ?: "";
     }
 }
