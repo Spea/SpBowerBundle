@@ -6,6 +6,7 @@ Changelog
 * When the retrieved mapping from the bower command ```bower list --map``` is invalid, the dependency cache will be deleted
 * The dependency cache warmer no longer creates the cache twice when install_on_warmup is enabled
 * An exception is now thrown when a required js/css file could not be found when retrieving the dependency mapping
+* Moved convertion of a package name to a valid assetic name to its own class
 
 ### 0.5 (2013-03-14)
 

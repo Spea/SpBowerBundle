@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Assetic;
 
 use Sp\BowerBundle\Bower\FileNotFoundException;
+use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
 use Sp\BowerBundle\Bower\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
@@ -34,6 +35,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $bowerManager;
 
     /**
+     * @var \Sp\BowerBundle\Naming\PackageNamingStrategyInterface
+     */
+    protected $namingStrategy;
+
+    /**
      * @var array
      */
     protected $cssFilters = array();
@@ -54,13 +60,15 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $packageJsFilters = array();
 
     /**
-     * @param \Sp\BowerBundle\Bower\Bower        $bower
-     * @param \Sp\BowerBundle\Bower\BowerManager $bowerManager
+     * @param \Sp\BowerBundle\Bower\Bower                           $bower
+     * @param \Sp\BowerBundle\Bower\BowerManager                    $bowerManager
+     * @param \Sp\BowerBundle\Naming\PackageNamingStrategyInterface $namingStrategy
      */
-    public function __construct(Bower $bower, BowerManager $bowerManager)
+    public function __construct(Bower $bower, BowerManager $bowerManager, PackageNamingStrategyInterface $namingStrategy)
     {
         $this->bower = $bower;
         $this->bowerManager = $bowerManager;
+        $this->namingStrategy = $namingStrategy;
     }
 
     /**
@@ -79,7 +87,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
             }
 
             foreach ($mapping as $packageName => $package) {
-                $packageName = $this->convertPackageName($packageName);
+                $packageName = $this->namingStrategy->translateName($packageName);
                 $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
             }
         }
@@ -217,7 +225,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
         $jsFiles = array();
         if (isset($package['dependencies'])) {
             foreach ($package['dependencies'] as $packageDependency => $value) {
-                $packageDependency = $this->convertPackageName($packageDependency);
+                $packageDependency = $this->namingStrategy->translateName($packageDependency);
                 $jsFiles[] = '@' . $packageDependency . '_js';
                 $cssFiles[] = '@' . $packageDependency . '_css';
             }
@@ -284,16 +292,6 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected function isStylesheet($file)
     {
         return pathinfo($file, PATHINFO_EXTENSION) == 'css';
-    }
-
-    /**
-     * @param string $packageName
-     *
-     * @return string
-     */
-    protected function convertPackageName($packageName)
-    {
-        return str_replace(array('-', '.'), '_', $packageName);
     }
 
     /**

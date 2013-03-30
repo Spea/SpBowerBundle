@@ -13,6 +13,7 @@ namespace Sp\BowerBundle\Tests\Assetic;
 
 use Sp\BowerBundle\Bower\Configuration;
 use Sp\BowerBundle\Assetic\BowerResource;
+use Sp\BowerBundle\Naming\PackageNamingStrategy;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -38,7 +39,7 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->bower = $this->getMockBuilder('Sp\BowerBundle\Bower\Bower')->disableOriginalConstructor()->getMock();
         $this->bowerManager = $this->getMockBuilder('Sp\BowerBundle\Bower\BowerManager')->disableOriginalConstructor()->getMock();
-        $this->bowerResource = new BowerResource($this->bower, $this->bowerManager);
+        $this->bowerResource = new BowerResource($this->bower, $this->bowerManager, new PackageNamingStrategy());
 
         $config = new Configuration('/foo');
         $bundles = array(
@@ -106,5 +107,4 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($packageCssFilter, $formulae['package_css'][1]);
         $this->assertNotContains($fooPackageCssFilter, $formulae['package_css'][1]);
     }
-
 }

@@ -6,9 +6,13 @@
 
     <parameters>
         <parameter key="sp_bower.assetic.bower_resource.class">Sp\BowerBundle\Assetic\BowerResource</parameter>
+        <parameter key="sp_bower.package_naming_strategy.class">Sp\BowerBundle\Naming\PackageNamingStrategy</parameter>
     </parameters>
 
     <services>
+        <service id="sp_bower.package_naming_strategy" class="%sp_bower.package_naming_strategy.class%" public="false">
+        </service>
+
         <service id="sp_bower.assetic.config_loader" class="%assetic.config_loader.class%" public="false">
             <tag name="assetic.formula_loader" alias="sp_config" />
         </service>
@@ -17,6 +21,7 @@
             <tag name="assetic.formula_resource" loader="sp_config" />
             <argument type="service" id="sp_bower.bower" />
             <argument type="service" id="sp_bower.bower_manager" />
+            <argument type="service" id="sp_bower.package_naming_strategy" />
         </service>
     </services>
 </container>
