@@ -8,6 +8,7 @@ Changelog
 * An exception is now thrown when a required js/css file could not be found when retrieving the dependency mapping
 * Added new interface for convertiong a package name to an assetic name
 * Removed deprecated configuration option ```register_assets```
+* Added error handling for command execution
 
 ### 0.5 (2013-03-14)
 

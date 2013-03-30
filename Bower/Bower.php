@@ -11,9 +11,11 @@
 
 namespace Sp\BowerBundle\Bower;
 
+use Doctrine\Common\Cache\Cache;
+use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\ProcessBuilder;
-use Doctrine\Common\Cache\Cache;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -72,7 +74,7 @@ class Bower
      *
      * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
-     * @throws Exception
+     * @throws Exception\RuntimeException
      * @return Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
@@ -80,7 +82,7 @@ class Bower
         $result = $this->execCommand($config, array('list', '--map'));
         $output = $result->getProcess()->getOutput();
         if (strpos($output, 'error')) {
-            throw new Exception(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
+            throw new RuntimeException(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
         }
 
         $mapping = json_decode($output, true);
@@ -101,18 +103,20 @@ class Bower
      *
      * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
-     * @throws Exception
+     * @throws Exception\RuntimeException
      * @return mixed
      */
     public function getDependencyMapping(ConfigurationInterface $config)
     {
         $event = new BowerEvent($config, array());
         $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
-        $config =  $event->getConfiguration();
+        $config = $event->getConfiguration();
 
         $cacheKey = $this->createCacheKey($config);
         if (!$this->dependencyCache->contains($cacheKey)) {
-            throw new Exception(sprintf('Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()));
+            throw new RuntimeException(sprintf(
+                'Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()
+            ));
         }
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, array()));
@@ -124,7 +128,7 @@ class Bower
             if (isset($package['source']['main'])) {
                 $files = $package['source']['main'];
                 if (is_string($files)) {
-                    $mapping[$packageName]['source']['main']  = $this->resolvePath($config->getDirectory(), $files);
+                    $mapping[$packageName]['source']['main'] = $this->resolvePath($config->getDirectory(), $files);
                 } else {
                     foreach ($files as $key => $source) {
                         $mapping[$packageName]['source']['main'][$key] = $this->resolvePath($config->getDirectory(), $source);
@@ -163,7 +167,7 @@ class Bower
      */
     protected function dumpBowerConfig(ConfigurationInterface $configuration)
     {
-        $configFile = $configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc';
+        $configFile = $configuration->getDirectory() . DIRECTORY_SEPARATOR . '.bowerrc';
         if (!file_exists($configFile) || file_get_contents($configFile) != $configuration->getJson()) {
             file_put_contents($configFile, $configuration->getJson());
         }
@@ -186,6 +190,7 @@ class Bower
      * @param string|array               $commands
      * @param \Closure|string|array|null $callback
      *
+     * @throws Exception\RuntimeException
      * @return BowerResult
      */
     private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
@@ -196,7 +201,7 @@ class Bower
 
         $event = new BowerEvent($config, $commands);
         $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
-        $config =  $event->getConfiguration();
+        $config = $event->getConfiguration();
 
         $this->dumpBowerConfig($config);
 
@@ -210,6 +215,14 @@ class Bower
         $proc = $pb->getProcess();
         $proc->run($callback);
 
+        if (!$proc->isSuccessful()) {
+            throw new RuntimeException(sprintf(
+                'An error occurred while executing the command %s. The error was: "%s"',
+                $proc->getCommandLine(),
+                trim($proc->getErrorOutput())
+            ));
+        }
+
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));
 
         return new BowerResult($proc, $config);
@@ -221,7 +234,7 @@ class Bower
      * @param string $configDir
      * @param string $file
      *
-     * @throws FileNotFoundException
+     * @throws Exception\FileNotFoundException
      * @return string
      */
     protected function resolvePath($configDir, $file)
@@ -234,10 +247,10 @@ class Bower
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if (!file_exists($file) && in_array($extension, array('json', 'css'))) {
             throw new FileNotFoundException(
-                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $configDir ."/".$file)
+                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $configDir . "/" . $file)
             );
         }
 
-        return realpath($file) ?: "";
+        return realpath($file) ? : "";
     }
 }

@@ -11,10 +11,10 @@
 
 namespace Sp\BowerBundle\Assetic;
 
-use Sp\BowerBundle\Bower\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
 use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
-use Sp\BowerBundle\Bower\Exception;
+use Sp\BowerBundle\Bower\Exception\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\Bower;
 use Symfony\Component\Config\Resource\ResourceInterface;

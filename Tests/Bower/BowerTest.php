@@ -81,6 +81,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
         $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
 
@@ -107,6 +108,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
         $this->bower->expects($this->once())->method('dumpBowerConfig');
         $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
@@ -129,6 +131,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
+
         $this->bower->expects($this->once())->method('dumpBowerConfig');
         $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
         $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
@@ -163,7 +167,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Sp\BowerBundle\Bower\FileNotFoundException
+     * @expectedException \Sp\BowerBundle\Bower\Exception\FileNotFoundException
      */
     public function testGetDependencyMappingThrowsFileNotFoundException()
     {
@@ -175,6 +179,19 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())->method('fetch')->will($this->returnValue($arrayDependencyMapping));
 
         $this->bower->getDependencyMapping($config);
+    }
+
+    /**
+     * @expectedException \Sp\BowerBundle\Bower\Exception\RuntimeException
+     */
+    public function testUnsuccessfulInstallThrowsRuntimeException()
+    {
+        $configDir = "/config_dir";
+        $config = new Configuration($configDir);
+        $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(false));
+
+        $this->bower->install($config);
     }
 
     public function componentsProvider()

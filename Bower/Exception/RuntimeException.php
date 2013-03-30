@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Sp\BowerBundle\Bower;
+namespace Sp\BowerBundle\Bower\Exception;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class FileNotFoundException extends Exception
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

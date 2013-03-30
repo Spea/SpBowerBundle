@@ -4,6 +4,17 @@ Upgrade instruction
 This document describes the changes needed when upgrading because of a BC
 break. For the full list of changes, please look at the Changelog file.
 
+## 0.5 to 0.6
+
+### Exceptions
+
+The exception class ```Sp\BowerBundle\Bower\Exception``` was removed.
+If you used this class to catch or throw new exceptions, replace it with one of the new ones:
+
+* [Sp\BowerBundle\Bower\Exception\ExceptionInterface](Bower/Exception/ExceptionInterface.php)
+* [Sp\BowerBundle\Bower\Exception\FileNotFoundException](Bower/Exception/FileNotFoundException.php)
+* [Sp\BowerBundle\Bower\Exception\RuntimeException](Bower/Exception/RuntimeException.php)
+
 ## 0.3 to 0.4
 
 ### Configuration
