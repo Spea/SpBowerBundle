@@ -125,7 +125,7 @@ then you can use them in your templates (or wherever you need them) like this
 
 **Warning**:
 > Your site may be slowed down if you enabled ```use_controller``` in the assetic bundle and
-> ```register_assets``` in this bundle.
+> ```assetic``` in this bundle.
 
 ### Step 6: Add composer scripts for automatic update of dependencies
 

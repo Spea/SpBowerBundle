@@ -37,10 +37,7 @@ class SpBowerExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
-
-        $registerAssets = $config['register_assets'];
-        $registerAssets = (isset($config['assetic'])) ? $config['assetic']['enabled'] : $registerAssets;
-        if ($registerAssets) {
+        if ($config['assetic']['enabled']) {
             $this->registerAsseticConfiguration($config, $container, $loader);
         }
 
@@ -77,10 +74,6 @@ class SpBowerExtension extends Extension
         }
 
         $loader->load('assetic.xml');
-
-        if (!isset($config['assetic'])) {
-            return;
-        }
 
         $resourceDefinition = $container->getDefinition('sp_bower.assetic.bower_resource');
         $resourceDefinition->addMethodCall('setJsFilters', array($config['assetic']['filters']['js']));

@@ -161,7 +161,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $config = array(
             'sp_bower' => array(
-                'register_assets' => false,
+                'assetic' => false,
                 'install_on_warmup' => true,
                 'bundles' => array(
                     'DemoBundle' => array(

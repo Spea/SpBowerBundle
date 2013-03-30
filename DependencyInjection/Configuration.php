@@ -33,11 +33,11 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('bin')->defaultValue(function() use ($finder) { return $finder->find('bower', '/usr/bin/bower'); })->end()
-                ->booleanNode('register_assets')->info('DEPRECATED! Please use: assetic ')->defaultValue(true)->end() // @deprecated, to be removed in 0.5
                 ->scalarNode('cache_dir')->cannotBeEmpty()->defaultValue('%kernel.cache_dir%/sp_bower')->end()
                 ->booleanNode('install_on_warmup')->defaultValue(false)->end()
                 ->booleanNode('keep_bowerrc')->defaultValue(false)->end()
                 ->arrayNode('assetic')
+                    ->addDefaultsIfNotSet()
                     ->treatNullLike(array('enabled' => true))
                     ->treatTrueLike(array('enabled' => true))
                     ->treatFalseLike(array('enabled' => false))
