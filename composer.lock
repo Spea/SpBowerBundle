@@ -1,5 +1,5 @@
 {
-    "hash": "2f723b2f49262920ab706f4b070751de",
+    "hash": "59cba94afe81606ec9e2d7cdf1c7e891",
     "packages": [
         {
             "name": "doctrine/common",
@@ -53,7 +53,7 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes Schmitt",
+                    "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "https://github.com/schmittjoh",
                     "role": "Developer of wrapped JMSSerializerBundle"

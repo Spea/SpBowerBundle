@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.7-dev
+
+...
+
 ### 0.6 (2013-04-06)
 
 * When the retrieved mapping from the bower command ```bower list --map``` is invalid, the dependency cache will be deleted
