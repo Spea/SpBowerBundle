@@ -82,7 +82,7 @@ class Bower
         $result = $this->execCommand($config, array('list', '--map'));
         $output = $result->getProcess()->getOutput();
         if (strpos($output, 'error')) {
-            throw new RuntimeException(sprintf('An error occured while creating dependency mapping. The error was %s.', $output));
+            throw new RuntimeException(sprintf('An error occurred while creating dependency mapping. The error was %s.', $output));
         }
 
         $mapping = json_decode($output, true);
