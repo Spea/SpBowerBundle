@@ -10,7 +10,7 @@ Changelog
 * When the retrieved mapping from the bower command ```bower list --map``` is invalid, the dependency cache will be deleted
 * The dependency cache warmer no longer creates the cache twice when install_on_warmup is enabled
 * An exception is now thrown when a required js/css file could not be found when retrieving the dependency mapping
-* Added new interface for convertiong a package name to an assetic name
+* Added new interface for converting a package name to an assetic name
 * Removed deprecated configuration option ```register_assets```
 * Added error handling for command execution
 
@@ -20,7 +20,7 @@ Changelog
 
 ### 0.4 (2013-01-22)
 
-* Added possiblity to add assetic filters to all (or some) bower packages
+* Added possibility to add assetic filters to all (or some) bower packages
 * Deprecated the configuration option ```register_assets```. More on that can be found in the [upgrade instructions](Upgrade.md)
 * Added bundle notation support for the ```config_dir``` and ```asset_dir``` option
 * Fixed a bug where asset paths were not resolved correctly when using a temporary .bowerrc file

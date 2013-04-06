@@ -1,7 +1,7 @@
 SpBowerBundle Assetic Filters
 =============================
 
-SpBowerBundle offers the possiblity to add assetic filters to all (or some) of your bower packages.
+SpBowerBundle offers the possibility to add assetic filters to all (or some) of your bower packages.
 
 ### Adding assetic filters to all bower packages
 
