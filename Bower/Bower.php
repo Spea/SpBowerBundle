@@ -145,6 +145,16 @@ class Bower
                     }
                 }
             }
+            if (isset($package['source']['styles'])) {
+                $files = $package['source']['styles'];
+                if (is_string($files)) {
+                    $mapping[$packageName]['source']['styles'] = $this->resolvePath($config->getDirectory(), $files);
+                } else {
+                    foreach ($files as $key => $source) {
+                        $mapping[$packageName]['source']['styles'][$key] = $this->resolvePath($config->getDirectory(), $source);
+                    }
+                }
+            }
         }
 
         return $mapping;
