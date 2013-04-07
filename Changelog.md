@@ -3,6 +3,7 @@ Changelog
 
 ### 0.7-dev
 
+* Added support for scripts property in the component.json file. As used in node and implemented in the jquery component.
 ...
 
 ### 0.6 (2013-04-06)
