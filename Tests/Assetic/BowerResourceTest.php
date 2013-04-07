@@ -81,6 +81,26 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($jsFilters, $formulae['foo_package_js'][1]);
     }
 
+    public function testGetContentConsidersScriptsProperty()
+    {
+        $formulae = $this->bowerResource->getContent();
+
+        $this->assertArrayHasKey('package_js', $formulae);
+
+        $this->assertContains('main.js', $formulae['foo_package_js'][0]);
+        $this->assertContains('customized.js', $formulae['foo_package_js'][0]);
+    }
+
+    public function testGetContentConsidersStylesProperty()
+    {
+        $formulae = $this->bowerResource->getContent();
+
+        $this->assertArrayHasKey('package_css', $formulae);
+
+        $this->assertContains('main.css', $formulae['foo_package_css'][0]);
+        $this->assertContains('customized.css', $formulae['foo_package_css'][0]);
+    }
+
     public function testFormulaHasPackageFilters()
     {
         $jsFilter = 'some_js_filter';

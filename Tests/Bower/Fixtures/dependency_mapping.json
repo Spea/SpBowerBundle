@@ -4,6 +4,14 @@
             "main": [
                 "../components/foo_package/foo.css",
                 "../components/foo_package/barfoo.js"
+            ],
+            "scripts": [
+                "main.js",
+                "customized.js"
+            ],
+            "styles": [
+                "main.css",
+                "customized.css"
             ]
         },
         "dependencies": {

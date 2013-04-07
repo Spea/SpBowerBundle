@@ -6,6 +6,14 @@ return array(
                 "../components/foo_package/foo.css",
                 "../components/foo_package/barfoo.js"
             ),
+            "scripts" => array(
+                "main.js",
+                "customized.js",
+            ),
+            "styles" => array(
+                "main.css",
+                "customized.css",
+            ),
         ),
         "dependencies" => array(
             "package" => array(
