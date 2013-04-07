@@ -3,7 +3,7 @@ Changelog
 
 ### 0.7-dev
 
-* Added support for ```scripts``` and ```styles``` properties
+* Added support for ```scripts``` and ```styles``` properties in the component.json file. As used in node
 
 ### 0.6 (2013-04-06)
 

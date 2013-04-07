@@ -242,12 +242,22 @@ class BowerResource extends ConfigurationResource implements \Serializable
         }
 
         if (isset($package['source']['scripts'])) {
-            $jsFiles = array_merge($jsFiles, $package['source']['scripts']);
+            if (is_string($package['source']['scripts'])) {
+                array_push($jsFiles, $package['source']['scripts']);
+            } else if (is_array($package['source']['scripts'])) {
+                $jsFiles = array_merge($jsFiles, $package['source']['scripts']);
+            }
+
             $jsFiles = array_unique($jsFiles);
         }
 
         if (isset($package['source']['styles'])) {
-            $cssFiles= array_merge($cssFiles, $package['source']['styles']);
+            if (is_string($package['source']['styles'])) {
+                array_push($cssFiles, $package['source']['styles']);
+            } else if (is_array($package['source']['styles'])) {
+                $cssFiles= array_merge($cssFiles, $package['source']['styles']);
+            }
+
             $cssFiles = array_unique($cssFiles);
         }
 
