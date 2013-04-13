@@ -4,6 +4,7 @@ Changelog
 ### 0.7-dev
 
 * Added support for ```scripts``` and ```styles``` properties in the component.json file. As used in node
+* Throw an exception instead of deleting the cache when the dependency mapping returned from bower is invalid
 
 ### 0.6 (2013-04-06)
 

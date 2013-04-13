@@ -13,6 +13,7 @@ namespace Sp\BowerBundle\Bower;
 
 use Doctrine\Common\Cache\Cache;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\MappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\ProcessBuilder;
@@ -74,7 +75,7 @@ class Bower
      *
      * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\MappingException
      * @return Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
@@ -82,17 +83,15 @@ class Bower
         $result = $this->execCommand($config, array('list', '--map'));
         $output = $result->getProcess()->getOutput();
         if (strpos($output, 'error')) {
-            throw new RuntimeException(sprintf('An error occurred while creating dependency mapping. The error was %s.', $output));
+            throw new MappingException(sprintf('An error occurred while creating dependency mapping. The error was %s.', $output));
         }
 
         $mapping = json_decode($output, true);
-        $cacheKey = $this->createCacheKey($result->getConfig());
         if (null === $mapping) {
-            $this->dependencyCache->delete($cacheKey);
-
-            return $this;
+            throw new MappingException('Bower returned an invalid dependency mapping. This mostly happens when the dependencies are not yet installed or if you are using an old version of bower.');
         }
 
+        $cacheKey = $this->createCacheKey($result->getConfig());
         $this->dependencyCache->save($cacheKey, $mapping);
 
         return $this;
