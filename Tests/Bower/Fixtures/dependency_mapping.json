@@ -1,17 +1,17 @@
 {
-    "foo_package": {
+    "other_package": {
         "source": {
             "main": [
-                "../components/foo_package/foo.css",
-                "../components/foo_package/barfoo.js"
+                "../components/other_package/styles.css",
+                "../components/other_package/script.js"
             ],
             "scripts": [
-                "main.js",
-                "customized.js"
+                "../components/other_package/main.js",
+                "../components/other_package/customized.js"
             ],
             "styles": [
-                "main.css",
-                "customized.css"
+                "../components/other_package/main.css",
+                "../components/other_package/customized.css"
             ]
         },
         "dependencies": {
@@ -25,6 +25,47 @@
     "package": {
         "source": {
             "main": "../components/package/package.js"
+        }
+    },
+    "dependency_package": {
+        "source": {
+            "main": [
+                "../components/dependency_package/script.js",
+                "../components/dependency_package/utils.js",
+                "../components/dependency_package/styles.css",
+                "../components/dependency_package/navigation.css"
+            ],
+            "scripts": [
+                "../components/dependency_package/script.js",
+                "../components/dependency_package/utils.js"
+            ],
+            "styles": [
+                "../components/dependency_package/styles.css",
+                "../components/dependency_package/navigation.css"
+            ]
+        },
+        "dependencies": {
+            "package": {
+                "source": {
+                    "main": "../components/package/package.js"
+                }
+            },
+            "other_package": {
+                "source": {
+                    "main": [
+                        "../components/other_package/styles.css",
+                        "../components/other_package/script.js"
+                    ],
+                    "scripts": [
+                        "../components/other_package/main.js",
+                        "../components/other_package/customized.js"
+                    ],
+                    "styles": [
+                        "../components/other_package/main.css",
+                        "../components/other_package/customized.css"
+                    ]
+                }
+            }
         }
     },
     "invalid-package_name": {

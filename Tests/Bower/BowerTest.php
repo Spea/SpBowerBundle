@@ -20,7 +20,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class BowerTest extends \PHPUnit_Framework_TestCase
+class BowerTest extends AbstractBowerTest
 {
     /**
      * @var Bower
@@ -59,12 +59,22 @@ class BowerTest extends \PHPUnit_Framework_TestCase
      */
     protected $cache;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $dependencyMapper;
+
     public function setUp()
     {
         $this->target = sys_get_temp_dir() .'/bower_install';
         $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $this->bower = $this->getMock('Sp\BowerBundle\Bower\Bower', array('dumpBowerConfig'), array($this->bin, $this->cache, $this->eventDispatcher));
+        $this->dependencyMapper = $this->getMock('Sp\BowerBundle\Bower\Package\DependencyMapperInterface');
+        $this->bower = $this->getMock(
+            'Sp\BowerBundle\Bower\Bower',
+            array('dumpBowerConfig'),
+            array($this->bin, $this->cache, $this->eventDispatcher, $this->dependencyMapper)
+        );
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
@@ -100,8 +110,8 @@ class BowerTest extends \PHPUnit_Framework_TestCase
         $configDir = "/config_dir";
         $config = new Configuration($configDir);
 
-        $jsonDependencyMapping = file_get_contents(__DIR__ .'/Fixtures/dependency_mapping.json');
-        $arrayDependencyMapping = require __DIR__ .'/Fixtures/dependency_mapping.php';
+        $jsonDependencyMapping = file_get_contents(self::$fixturesDirectory .'/dependency_mapping.json');
+        $arrayDependencyMapping = require self::$fixturesDirectory .'/dependency_mapping.php';
 
         $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('list'));
@@ -139,35 +149,13 @@ class BowerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDependencyMapping()
     {
-        $configDir = __DIR__ ."/Fixtures/config";
+        $configDir = self::$fixturesDirectory ."/config";
         $config = new Configuration($configDir);
-        $arrayDependencyMapping = require __DIR__ .'/Fixtures/simple_dependency_mapping.php';
+        $arrayDependencyMapping = require self::$fixturesDirectory .'/simple_dependency_mapping.php';
 
         $this->cache->expects($this->once())->method('contains')->will($this->returnValue(true));
         $this->cache->expects($this->once())->method('fetch')->will($this->returnValue($arrayDependencyMapping));
-
-        $mapping = $this->bower->getDependencyMapping($config);
-        $this->assertCount(1, $mapping);
-        $this->assertArrayHasKey('source', $mapping['simple_package']);
-        $this->assertArrayHasKey('main', $mapping['simple_package']['source']);
-        $source = $mapping['simple_package']['source'];
-        $this->assertCount(3, $source['main']);
-        $this->assertEquals(__DIR__ ."/Fixtures/components/simple_package/styles.css", $source['main'][0]);
-        $this->assertEquals(__DIR__ ."/Fixtures/components/simple_package/script.js", $source['main'][1]);
-        $this->assertEquals("", $source['main'][2]);
-    }
-
-    /**
-     * @expectedException \Sp\BowerBundle\Bower\Exception\FileNotFoundException
-     */
-    public function testGetDependencyMappingThrowsFileNotFoundException()
-    {
-        $configDir = __DIR__ ."/Fixtures/config";
-        $config = new Configuration($configDir);
-        $arrayDependencyMapping = require __DIR__ .'/Fixtures/dependency_mapping.php';
-
-        $this->cache->expects($this->once())->method('contains')->will($this->returnValue(true));
-        $this->cache->expects($this->once())->method('fetch')->will($this->returnValue($arrayDependencyMapping));
+        $this->dependencyMapper->expects($this->once())->method('map')->with($this->equalTo($arrayDependencyMapping));
 
         $this->bower->getDependencyMapping($config);
     }
@@ -188,7 +176,7 @@ class BowerTest extends \PHPUnit_Framework_TestCase
     public function componentsProvider()
     {
         return array(
-            array(__DIR__ .'/Fixtures/config'),
+            array(self::$fixturesDirectory .'/config'),
             array(new DirectoryResource('test')),
         );
     }

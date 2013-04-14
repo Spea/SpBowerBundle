@@ -15,6 +15,8 @@ use Doctrine\Common\Cache\Cache;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
 use Sp\BowerBundle\Bower\Exception\MappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
+use Sp\BowerBundle\Bower\Package\DependencyMapper;
+use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -44,15 +46,23 @@ class Bower
     protected $eventDispatcher;
 
     /**
+     * @var \Sp\BowerBundle\Bower\Package\DependencyMapperInterface
+     */
+    protected $dependencyMapper;
+
+    /**
      * @param string                                             $bowerPath
      * @param \Doctrine\Common\Cache\Cache                       $dependencyCache
      * @param \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher
+     * @param Package\DependencyMapperInterface                  $dependencyMapper
      */
-    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcher $eventDispatcher)
+    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcher $eventDispatcher,
+                                DependencyMapperInterface $dependencyMapper = null)
     {
         $this->bowerPath = $bowerPath;
         $this->dependencyCache = $dependencyCache;
         $this->eventDispatcher = $eventDispatcher;
+        $this->dependencyMapper = $dependencyMapper ?: new DependencyMapper();
     }
 
     /**
@@ -122,41 +132,7 @@ class Bower
 
         $mapping = $this->dependencyCache->fetch($cacheKey);
 
-        // Make sure to have an absolute path for all sources.
-        foreach ($mapping as $packageName => $package) {
-            if (isset($package['source']['main'])) {
-                $files = $package['source']['main'];
-                if (is_string($files)) {
-                    $mapping[$packageName]['source']['main'] = $this->resolvePath($config->getDirectory(), $files);
-                } else {
-                    foreach ($files as $key => $source) {
-                        $mapping[$packageName]['source']['main'][$key] = $this->resolvePath($config->getDirectory(), $source);
-                    }
-                }
-            }
-            if (isset($package['source']['scripts'])) {
-                $files = $package['source']['scripts'];
-                if (is_string($files)) {
-                    $mapping[$packageName]['source']['scripts'] = $this->resolvePath($config->getDirectory(), $files);
-                } else {
-                    foreach ($files as $key => $source) {
-                        $mapping[$packageName]['source']['scripts'][$key] = $this->resolvePath($config->getDirectory(), $source);
-                    }
-                }
-            }
-            if (isset($package['source']['styles'])) {
-                $files = $package['source']['styles'];
-                if (is_string($files)) {
-                    $mapping[$packageName]['source']['styles'] = $this->resolvePath($config->getDirectory(), $files);
-                } else {
-                    foreach ($files as $key => $source) {
-                        $mapping[$packageName]['source']['styles'][$key] = $this->resolvePath($config->getDirectory(), $source);
-                    }
-                }
-            }
-        }
-
-        return $mapping;
+        return $this->dependencyMapper->map($mapping, $config);
     }
 
     /**
@@ -245,31 +221,5 @@ class Bower
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));
 
         return new BowerResult($proc, $config);
-    }
-
-    /**
-     * Creates an absolute path for all passed files based on the config directory..
-     *
-     * @param string $configDir
-     * @param string $file
-     *
-     * @throws Exception\FileNotFoundException
-     * @return string
-     */
-    protected function resolvePath($configDir, $file)
-    {
-        chdir($configDir);
-        if (strpos($file, '@') === 0) {
-            return $file;
-        }
-
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-        if (!file_exists($file) && in_array($extension, array('json', 'css'))) {
-            throw new FileNotFoundException(
-                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $configDir . "/" . $file)
-            );
-        }
-
-        return realpath($file) ? : "";
     }
 }

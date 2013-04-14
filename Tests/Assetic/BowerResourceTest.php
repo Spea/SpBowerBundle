@@ -13,12 +13,16 @@ namespace Sp\BowerBundle\Tests\Assetic;
 
 use Sp\BowerBundle\Bower\Configuration;
 use Sp\BowerBundle\Assetic\BowerResource;
+use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Naming\PackageNamingStrategy;
+use Sp\BowerBundle\Tests\Bower\AbstractBowerTest;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class BowerResourceTest extends \PHPUnit_Framework_TestCase
+class BowerResourceTest extends AbstractBowerTest
 {
     /**
      * @var BowerResource
@@ -41,15 +45,18 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
         $this->bowerManager = $this->getMockBuilder('Sp\BowerBundle\Bower\BowerManager')->disableOriginalConstructor()->getMock();
         $this->bowerResource = new BowerResource($this->bower, $this->bowerManager, new PackageNamingStrategy());
 
-        $config = new Configuration('/foo');
+        $configDir = self::$fixturesDirectory ."/config";
+        $config = new Configuration($configDir);
         $bundles = array(
             'DemoBundle' => $config,
         );
 
-        $arrayDependencyMapping = require __DIR__ .'/../Bower/Fixtures/dependency_mapping.php';
+        $arrayDependencyMapping = require self::$fixturesDirectory .'/dependency_mapping.php';
+        $mapper = new DependencyMapper();
+        $mapping = $mapper->map($arrayDependencyMapping, $config);
 
         $this->bowerManager->expects($this->once())->method('getBundles')->will($this->returnValue($bundles));
-        $this->bower->expects($this->once())->method('getDependencyMapping')->with($this->equalTo($config))->will($this->returnValue($arrayDependencyMapping));
+        $this->bower->expects($this->once())->method('getDependencyMapping')->with($this->equalTo($config))->will($this->returnValue($mapping));
     }
 
     /**
@@ -64,21 +71,21 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
         $this->bowerResource->setJsFilters($jsFilters);
         $formulae = $this->bowerResource->getContent();
 
-        $this->assertArrayHasKey('foo_package_css', $formulae);
-        $this->assertArrayHasKey('foo_package_js', $formulae);
+        $this->assertArrayHasKey('other_package_css', $formulae);
+        $this->assertArrayHasKey('other_package_js', $formulae);
         $this->assertArrayHasKey('invalid_package_name_js', $formulae);
         $this->assertArrayHasKey('invalid_package_name_css', $formulae);
         $this->assertArrayHasKey('package_css', $formulae);
         $this->assertArrayHasKey('package_js', $formulae);
 
-        $this->assertContains('../components/package/package.js', $formulae['package_js'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/package/package.js', $formulae['package_js'][0]);
         $this->assertEmpty($formulae['package_css'][0]);
 
-        $this->assertContains('@package_css', $formulae['foo_package_css'][0]);
-        $this->assertContains('../components/foo_package/foo.css', $formulae['foo_package_css'][0]);
-        $this->assertEquals($cssFilters, $formulae['foo_package_css'][1]);
-        $this->assertContains('@package_js', $formulae['foo_package_js'][0]);
-        $this->assertEquals($jsFilters, $formulae['foo_package_js'][1]);
+        $this->assertContains('@package_css', $formulae['other_package_css'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/other_package/styles.css', $formulae['other_package_css'][0]);
+        $this->assertEquals($cssFilters, $formulae['other_package_css'][1]);
+        $this->assertContains('@package_js', $formulae['other_package_js'][0]);
+        $this->assertEquals($jsFilters, $formulae['other_package_js'][1]);
     }
 
     public function testGetContentConsidersScriptsProperty()
@@ -87,8 +94,8 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('package_js', $formulae);
 
-        $this->assertContains('main.js', $formulae['foo_package_js'][0]);
-        $this->assertContains('customized.js', $formulae['foo_package_js'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/other_package/main.js', $formulae['other_package_js'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/other_package/customized.js', $formulae['other_package_js'][0]);
     }
 
     public function testGetContentConsidersStylesProperty()
@@ -97,33 +104,33 @@ class BowerResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('package_css', $formulae);
 
-        $this->assertContains('main.css', $formulae['foo_package_css'][0]);
-        $this->assertContains('customized.css', $formulae['foo_package_css'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/other_package/main.css', $formulae['other_package_css'][0]);
+        $this->assertContains(self::$fixturesDirectory .'/components/other_package/customized.css', $formulae['other_package_css'][0]);
     }
 
     public function testFormulaHasPackageFilters()
     {
         $jsFilter = 'some_js_filter';
         $cssFilter = 'some_css_filter';
-        $fooPackageCssFilter = 'foo_package_css_filter';
-        $fooPackageJsFilter = 'foo_package_js_filter';
+        $fooPackageCssFilter = 'other_package_css_filter';
+        $fooPackageJsFilter = 'other_package_js_filter';
         $packageCssFilter = 'package_css_filter';
 
         $this->bowerResource->setCssFilters(array($cssFilter));
         $this->bowerResource->setJsFilters(array($jsFilter));
-        $this->bowerResource->addPackageCssFilters('foo_package', array($fooPackageCssFilter));
-        $this->bowerResource->addPackageJsFilters('foo_package', array($fooPackageJsFilter));
+        $this->bowerResource->addPackageCssFilters('other_package', array($fooPackageCssFilter));
+        $this->bowerResource->addPackageJsFilters('other_package', array($fooPackageJsFilter));
         $this->bowerResource->addPackageCssFilters('package', array($packageCssFilter));
 
         $formulae = $this->bowerResource->getContent();
 
-        $this->assertContains('@package_css', $formulae['foo_package_css'][0]);
-        $this->assertContains($cssFilter, $formulae['foo_package_css'][1]);
-        $this->assertContains($fooPackageCssFilter, $formulae['foo_package_css'][1]);
-        $this->assertContains($fooPackageJsFilter, $formulae['foo_package_js'][1]);
-        $this->assertNotContains($packageCssFilter, $formulae['foo_package_css'][1]);
+        $this->assertContains('@package_css', $formulae['other_package_css'][0]);
+        $this->assertContains($cssFilter, $formulae['other_package_css'][1]);
+        $this->assertContains($fooPackageCssFilter, $formulae['other_package_css'][1]);
+        $this->assertContains($fooPackageJsFilter, $formulae['other_package_js'][1]);
+        $this->assertNotContains($packageCssFilter, $formulae['other_package_css'][1]);
 
-        $this->assertContains($cssFilter, $formulae['foo_package_css'][1]);
+        $this->assertContains($cssFilter, $formulae['other_package_css'][1]);
         $this->assertContains($packageCssFilter, $formulae['package_css'][1]);
         $this->assertNotContains($fooPackageCssFilter, $formulae['package_css'][1]);
     }

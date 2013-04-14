@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
+class BowerFunctionalTest extends AbstractBowerTest
 {
     protected $bower;
     protected $target;
@@ -42,7 +42,7 @@ class BowerFunctionalTest extends \PHPUnit_Framework_TestCase
 
     public function testFileInstall()
     {
-        $src = __DIR__ .'/Fixtures/config';
+        $src = self::$fixturesDirectory .'/config';
         $configuration = new Configuration($src);
         $configuration->setJsonFile('component.json');
         $configuration->setEndpoint('https://bower.herokuapp.com');

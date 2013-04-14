@@ -11,13 +11,14 @@
 
 namespace Sp\BowerBundle\Assetic;
 
+use Sp\BowerBundle\Bower\ConfigurationInterface;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\RuntimeException;
+use Sp\BowerBundle\Bower\Package\Package;
 use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
-use Sp\BowerBundle\Bower\Exception\Exception;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\Bower;
-use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -77,17 +78,19 @@ class BowerResource extends ConfigurationResource implements \Serializable
     public function getContent()
     {
         $formulae = array();
+        /** @var $config ConfigurationInterface */
         foreach ($this->bowerManager->getBundles() as $config) {
             try {
                 $mapping = $this->bower->getDependencyMapping($config);
             } catch(FileNotFoundException $ex) {
                 throw $ex;
-            } catch (Exception $ex) {
-                throw new Exception('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
+            } catch (RuntimeException $ex) {
+                throw new RuntimeException('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
             }
 
-            foreach ($mapping as $packageName => $package) {
-                $packageName = $this->namingStrategy->translateName($packageName);
+            /** @var $package Package */
+            foreach ($mapping as $package) {
+                $packageName = $this->namingStrategy->translateName($package->getName());
                 $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
             }
         }
@@ -204,61 +207,23 @@ class BowerResource extends ConfigurationResource implements \Serializable
     /**
      * Creates formulae for the given package.
      *
-     * @param array  $package
-     * @param string $packageName
-     * @param string $configDir
+     * @param \Sp\BowerBundle\Bower\Package\Package $package
+     * @param string                                $packageName
+     * @param string                                $configDir
      *
      * @return array<string,array<array>>
      */
-    protected function createPackageFormulae(array $package, $packageName, $configDir)
+    protected function createPackageFormulae(Package $package, $packageName, $configDir)
     {
         $formulae = array();
-        $files = array();
-        if (isset($package['source']['main'])) {
-            $files = $package['source']['main'];
-            if (is_string($files)) {
-                $files = array($files);
-            }
-        }
 
-        $cssFiles = array();
-        $jsFiles = array();
-        if (isset($package['dependencies'])) {
-            foreach ($package['dependencies'] as $packageDependency => $value) {
-                $packageDependency = $this->namingStrategy->translateName($packageDependency);
-                $jsFiles[] = '@' . $packageDependency . '_js';
-                $cssFiles[] = '@' . $packageDependency . '_css';
-            }
-        }
-
-        foreach ($files as $file) {
-            if ($this->isJavascript($file)) {
-                $jsFiles[] = $file;
-            }
-
-            if ($this->isStylesheet($file)) {
-                $cssFiles[] = $file;
-            }
-        }
-
-        if (isset($package['source']['scripts'])) {
-            if (is_string($package['source']['scripts'])) {
-                array_push($jsFiles, $package['source']['scripts']);
-            } else if (is_array($package['source']['scripts'])) {
-                $jsFiles = array_merge($jsFiles, $package['source']['scripts']);
-            }
-
-            $jsFiles = array_unique($jsFiles);
-        }
-
-        if (isset($package['source']['styles'])) {
-            if (is_string($package['source']['styles'])) {
-                array_push($cssFiles, $package['source']['styles']);
-            } else if (is_array($package['source']['styles'])) {
-                $cssFiles= array_merge($cssFiles, $package['source']['styles']);
-            }
-
-            $cssFiles = array_unique($cssFiles);
+        $cssFiles = $package->getStyles()->toArray();
+        $jsFiles = $package->getScripts()->toArray();
+        /** @var $packageDependency Package */
+        foreach ($package->getDependencies() as $packageDependency) {
+            $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
+            $jsFiles[] = '@' . $packageDependencyName . '_js';
+            $cssFiles[] = '@' . $packageDependencyName . '_css';
         }
 
         $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageName), array());
