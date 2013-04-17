@@ -222,8 +222,8 @@ class BowerResource extends ConfigurationResource implements \Serializable
         /** @var $packageDependency Package */
         foreach ($package->getDependencies() as $packageDependency) {
             $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-            $jsFiles[] = '@' . $packageDependencyName . '_js';
-            $cssFiles[] = '@' . $packageDependencyName . '_css';
+            array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
+            array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
         }
 
         $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageName), array());
@@ -234,6 +234,8 @@ class BowerResource extends ConfigurationResource implements \Serializable
 
     /**
      * @param string $packageName
+     *
+     * @return array
      */
     protected function resolveCssFilters($packageName)
     {
@@ -247,6 +249,8 @@ class BowerResource extends ConfigurationResource implements \Serializable
 
     /**
      * @param string $packageName
+     *
+     * @return array
      */
     protected function resolveJsFilters($packageName)
     {
@@ -256,26 +260,6 @@ class BowerResource extends ConfigurationResource implements \Serializable
         }
 
         return $jsFilters;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    protected function isJavascript($file)
-    {
-        return pathinfo($file, PATHINFO_EXTENSION) == 'js';
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    protected function isStylesheet($file)
-    {
-        return pathinfo($file, PATHINFO_EXTENSION) == 'css';
     }
 
     /**

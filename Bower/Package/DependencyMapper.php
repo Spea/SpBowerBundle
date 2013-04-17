@@ -29,7 +29,7 @@ class DependencyMapper implements DependencyMapperInterface
     /**
      * @var array
      */
-    private $requiredExtensions = array('json', 'css');
+    private $requiredExtensions = array('js', 'css');
 
     /**
      * @var array
@@ -211,7 +211,7 @@ class DependencyMapper implements DependencyMapperInterface
 
             return 0;
         });
-        
+
         return $packagesInfo;
     }
 }
