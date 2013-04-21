@@ -199,9 +199,10 @@ class DependencyMapper implements DependencyMapperInterface
      */
     private function orderPackages(array $packagesInfo)
     {
-        uasort($packagesInfo, function($first, $second) {
-            $firstCount = isset($first[self::DEPENDENCIES_KEY]) ? count($first[self::DEPENDENCIES_KEY]) : 0;
-            $secondCount = isset($second[self::DEPENDENCIES_KEY]) ? count($second[self::DEPENDENCIES_KEY]) : 0;
+        $dependenciesKey = self::DEPENDENCIES_KEY;
+        uasort($packagesInfo, function($first, $second) use($dependenciesKey) {
+            $firstCount = isset($first[$dependenciesKey]) ? count($first[$dependenciesKey]) : 0;
+            $secondCount = isset($second[$dependenciesKey]) ? count($second[$dependenciesKey]) : 0;
 
             if ($firstCount > $secondCount) {
                 return 1;
