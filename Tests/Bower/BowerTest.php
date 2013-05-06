@@ -87,9 +87,10 @@ class BowerTest extends AbstractBowerTest
     public function testInstall($configDir)
     {
         $config = new Configuration($configDir);
-        $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
-        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('setTimeout')->with($this->equalTo(600));
+        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo($this->bin));
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
         $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
@@ -113,10 +114,11 @@ class BowerTest extends AbstractBowerTest
         $jsonDependencyMapping = file_get_contents(self::$fixturesDirectory .'/dependency_mapping.json');
         $arrayDependencyMapping = require self::$fixturesDirectory .'/dependency_mapping.php';
 
-        $this->processBuilder->expects($this->at(1))->method('add')->with($this->equalTo($this->bin));
-        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo('list'));
-        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--map'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('setTimeout')->with($this->equalTo(600));
+        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo($this->bin));
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('list'));
+        $this->processBuilder->expects($this->at(4))->method('add')->with($this->equalTo('--map'));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
         $this->bower->expects($this->once())->method('dumpBowerConfig');
