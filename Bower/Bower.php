@@ -202,6 +202,7 @@ class Bower
 
         $pb = $this->getProcessBuilder();
         $pb->setWorkingDirectory($config->getDirectory());
+        $pb->setTimeout(600);
         $pb->add($this->bowerPath);
         foreach ($commands as $command) {
             $pb->add($command);
