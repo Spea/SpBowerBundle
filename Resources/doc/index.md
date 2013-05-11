@@ -156,3 +156,4 @@ sp_bower:
 
 - [Configuration Reference](configuration_reference.md)
 - [Assetic Filters](assetic_filters.md)
+- [What to do when the images/fonts from a css file are not displayed?](image_font_processing.md)
