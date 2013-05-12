@@ -12,6 +12,7 @@ sp_bower:
     # assetic: ~
     assetic:
         enabled: true
+        nest_dependencies: true
         filters:
             css:
                 - ?yui_css

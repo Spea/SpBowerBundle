@@ -11,9 +11,11 @@
 
 namespace Sp\BowerBundle\Tests\Assetic;
 
+use Sp\BowerBundle\Assetic\PackageResource;
 use Sp\BowerBundle\Bower\Configuration;
 use Sp\BowerBundle\Assetic\BowerResource;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
+use Sp\BowerBundle\Bower\Package\Package;
 use Sp\BowerBundle\Naming\PackageNamingStrategy;
 use Sp\BowerBundle\Tests\Bower\AbstractBowerTest;
 use org\bovigo\vfs\vfsStream;
@@ -118,9 +120,15 @@ class BowerResourceTest extends AbstractBowerTest
 
         $this->bowerResource->setCssFilters(array($cssFilter));
         $this->bowerResource->setJsFilters(array($jsFilter));
-        $this->bowerResource->addPackageCssFilters('other_package', array($fooPackageCssFilter));
-        $this->bowerResource->addPackageJsFilters('other_package', array($fooPackageJsFilter));
-        $this->bowerResource->addPackageCssFilters('package', array($packageCssFilter));
+
+        $otherPackageResource = new PackageResource('other_package');
+        $otherPackageResource->setCssFilters(array($fooPackageCssFilter));
+        $otherPackageResource->setJsFilters(array($fooPackageJsFilter));
+        $this->bowerResource->addPackageResource($otherPackageResource);
+
+        $packageResource = new PackageResource('package');
+        $packageResource->setCssFilters(array($packageCssFilter));
+        $this->bowerResource->addPackageResource($packageResource);
 
         $formulae = $this->bowerResource->getContent();
 

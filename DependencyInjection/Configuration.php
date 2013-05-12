@@ -34,8 +34,8 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bin')->defaultValue(function() use ($finder) { return $finder->find('bower', '/usr/bin/bower'); })->end()
                 ->scalarNode('cache_dir')->cannotBeEmpty()->defaultValue('%kernel.cache_dir%/sp_bower')->end()
-                ->booleanNode('install_on_warmup')->defaultValue(false)->end()
-                ->booleanNode('keep_bowerrc')->defaultValue(false)->end()
+                ->booleanNode('install_on_warmup')->defaultFalse()->end()
+                ->booleanNode('keep_bowerrc')->defaultFalse()->end()
                 ->arrayNode('assetic')
                     ->addDefaultsIfNotSet()
                     ->treatNullLike(array('enabled' => true))
@@ -43,6 +43,21 @@ class Configuration implements ConfigurationInterface
                     ->treatFalseLike(array('enabled' => false))
                     ->children()
                         ->booleanNode('enabled')->defaultValue(true)->end()
+                        ->arrayNode('nest_dependencies')
+                            ->treatNullLike(array('all' => true))
+                            ->treatTrueLike(array('all' => true))
+                            ->treatFalseLike(array('all' => false))
+                            ->prototype('scalar')->end()
+                            ->defaultvalue(array('all' => true))
+                            ->validate()
+                                ->ifTrue(function ($v) { return !isset($v['all']); })
+                                ->then(function ($v) {
+                                    $v['all'] = true;
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                         ->arrayNode('filters')
                             ->addDefaultsIfNotSet()
                             ->children()

@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="sp_bower.assetic.bower_resource.class">Sp\BowerBundle\Assetic\BowerResource</parameter>
+        <parameter key="sp_bower.assetic.package_resource.class">Sp\BowerBundle\Assetic\PackageResource</parameter>
         <parameter key="sp_bower.package_naming_strategy.class">Sp\BowerBundle\Naming\PackageNamingStrategy</parameter>
     </parameters>
 

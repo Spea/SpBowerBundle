@@ -80,13 +80,17 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load($config, $this->container);
 
         $definition = $this->container->getDefinition('sp_bower.bower_manager');
-        $calls = $definition->getMethodCalls();
 
         $this->assertFalse($this->container->getParameter('sp_bower.install_on_warmup'));
         $this->assertTrue($this->container->has('sp_bower.assetic.config_loader'));
         $this->assertTrue($this->container->has('sp_bower.assetic.bower_resource'));
 
+        $resourceDefinition = $this->container->getDefinition('sp_bower.assetic.bower_resource');
+        $resourceMethodCalls = $resourceDefinition->getMethodCalls();
+        $this->assertTrue($resourceMethodCalls[2][1][0]);
+
         // demo bundle assertions
+        $calls = $definition->getMethodCalls();
         $this->assertEquals('addBundle', $calls[0][0]);
         $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
@@ -94,6 +98,23 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->demoBundlePath .'/Resources/config/bower/../../public/components', $configCalls[0][1][0]);
         $this->assertEquals('component.json', $configCalls[1][1][0]);
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
+    }
+
+    public function loadDefaultsShouldEnabledNestDependencies()
+    {
+        $config = array(
+            'sp_bower' => array(
+                'bundles' => array(
+                    'DemoBundle' => array(),
+                ),
+            )
+        );
+
+        $this->extension->load($config, $this->container);
+
+        $resourceDefinition = $this->container->getDefinition('sp_bower.assetic.bower_resource');
+        $methodCalls = $resourceDefinition->getMethodCalls();
+        $this->assertTrue($methodCalls[2][1][0]);
     }
 
     public function testLoadUserFilters()
@@ -110,10 +131,14 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
                         'js' => $jsFilters,
                         'css' => $cssFilters,
                         'packages' => array(
-                            'my_package' => array(
+                            'bootstrap' => array(
                                 'css' => $cssPackageFilters,
                                 'js' => $jsPackageFilters
-                            )
+                            ),
+                            'jquery' => array(
+                                'css' => $cssPackageFilters,
+                                'js' => $jsPackageFilters
+                            ),
                         ),
                     ),
                 )
@@ -124,12 +149,21 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
 
         $resourceDefinition = $this->container->getDefinition('sp_bower.assetic.bower_resource');
         $resourceCalls = $resourceDefinition->getMethodCalls();
-        $this->assertEquals($resourceCalls[0][1][0], $jsFilters);
-        $this->assertEquals($resourceCalls[1][1][0], $cssFilters);
-        $this->assertEquals($resourceCalls[2][1][0], 'my_package');
-        $this->assertEquals($resourceCalls[2][1][1], $cssPackageFilters);
-        $this->assertEquals($resourceCalls[3][1][0], 'my_package');
-        $this->assertEquals($resourceCalls[3][1][1], $jsPackageFilters);
+        $this->assertMethodCall($resourceCalls, 'setJsFilters', array($jsFilters));
+        $this->assertMethodCall($resourceCalls, 'setCssFilters', array($cssFilters));
+        $bootstrapResource = $this->container->getDefinition('sp_bower.assetic.bootstrap_package_resource');
+        $this->assertNotNull($bootstrapResource);
+
+        $bootstrapMethodCalls = $bootstrapResource->getMethodCalls();
+        $this->assertMethodCall($bootstrapMethodCalls, 'setJsFilters', array($jsPackageFilters));
+        $this->assertMethodCall($bootstrapMethodCalls, 'setCssFilters', array($cssPackageFilters));
+
+        $jqueryResource = $this->container->getDefinition('sp_bower.assetic.jquery_package_resource');
+        $this->assertNotNull($jqueryResource);
+
+        $jqueryMethodCalls = $jqueryResource->getMethodCalls();
+        $this->assertMethodCall($jqueryMethodCalls , 'setJsFilters', array($jsPackageFilters));
+        $this->assertMethodCall($jqueryMethodCalls , 'setCssFilters', array($cssPackageFilters));
     }
 
     public function testBundleAnnotation()
@@ -153,7 +187,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         // demo bundle assertions
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
-        $this->assertEquals($this->demoBundlePath .'/assets', $configCalls[0][1][0]);
+        $this->assertMethodCall($configCalls, 'setAssetDirectory', $this->demoBundlePath .'/assets');
         $this->assertEquals($this->demoBundlePath .'/config', $configDefinition->getArgument(0));
     }
 
@@ -186,13 +220,89 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('DemoBundle', $calls[0][1][0]);
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
-        $this->assertEquals($this->demoBundlePath .'/Resources/public', $configCalls[0][1][0]);
-        $this->assertEquals('foo.json', $configCalls[1][1][0]);
-        $this->assertEquals('https://bower.example.com', $configCalls[2][1][0]);
+        $this->assertMethodCall($configCalls, 'setAssetDirectory', $this->demoBundlePath .'/Resources/public');
+        $this->assertMethodCall($configCalls, 'setJsonFile', 'foo.json');
+        $this->assertMethodCall($configCalls, 'setEndpoint', 'https://bower.example.com');
     }
 
+    /**
+     * @test
+     */
+    public function loadUserConfigShouldDisableNestDependencies()
+    {
+        $config = array(
+            'sp_bower' => array(
+                'bundles' => array(
+                    'DemoBundle' => array(),
+                ),
+                'assetic' => array(
+                    'enabled' => true,
+                    'nest_dependencies' => false,
+                )
+            )
+        );
+
+        $this->extension->load($config, $this->container);
+
+        $resourceDefinition = $this->container->getDefinition('sp_bower.assetic.bower_resource');
+        $methodCalls = $resourceDefinition->getMethodCalls();
+        $this->assertMethodCall($methodCalls, 'setNestDependencies', false);
+    }
+
+    /**
+     * @test
+     */
+    public function loadUserConfigShouldDisabledNestDependenciesOnPackage()
+    {
+
+        $config = array(
+            'sp_bower' => array(
+                'bundles' => array(
+                    'DemoBundle' => array(),
+                ),
+                'assetic' => array(
+                    'enabled' => true,
+                    'nest_dependencies' => array('bootstrap' => false)
+                )
+            )
+        );
+
+        $this->extension->load($config, $this->container);
+
+        $resourceDefinition = $this->container->getDefinition('sp_bower.assetic.bootstrap_package_resource');
+        $this->assertMethodCall($resourceDefinition->getMethodCalls(), 'setNestDependencies', false);
+    }
+
+    /**
+     * @param mixed $value
+     * @param string $key
+     */
     private function assertParameter($value, $key)
     {
         $this->assertEquals($value, $this->container->getParameter($key), sprintf('%s parameter is correct', $key));
+    }
+
+    /**
+     * @param array $methodCalls
+     * @param string $name
+     * @param mixed $expectedValues
+     */
+    private function assertMethodCall(array $methodCalls, $name, $expectedValues)
+    {
+        if (!is_array($expectedValues)) {
+            $expectedValues = array($expectedValues);
+        }
+
+        foreach ($methodCalls as $methodCall) {
+            if ($methodCall[0] == $name) {
+                foreach ($methodCall[1] as $key => $parameter) {
+                    $this->assertEquals($expectedValues[$key], $parameter);
+
+                    return;
+                }
+            }
+        }
+
+        $this->fail(sprintf('Failed asserting that method %s was called', $name));
     }
 }

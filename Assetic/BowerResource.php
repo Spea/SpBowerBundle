@@ -11,14 +11,16 @@
 
 namespace Sp\BowerBundle\Assetic;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Sp\BowerBundle\Bower\Bower;
+use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\ConfigurationInterface;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\Package;
 use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
 use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
-use Sp\BowerBundle\Bower\BowerManager;
-use Sp\BowerBundle\Bower\Bower;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -41,6 +43,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $namingStrategy;
 
     /**
+     * @var bool
+     */
+    protected $nestDependencies = true;
+
+    /**
      * @var array
      */
     protected $cssFilters = array();
@@ -51,14 +58,9 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $jsFilters = array();
 
     /**
-     * @var array
+     * @var Collection
      */
-    protected $packageCssFilters = array();
-
-    /**
-     * @var array
-     */
-    protected $packageJsFilters = array();
+    protected $packageResources;
 
     /**
      * @param \Sp\BowerBundle\Bower\Bower                           $bower
@@ -70,6 +72,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
         $this->bower = $bower;
         $this->bowerManager = $bowerManager;
         $this->namingStrategy = $namingStrategy;
+        $this->packageResources = new ArrayCollection();
     }
 
     /**
@@ -82,7 +85,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
         foreach ($this->bowerManager->getBundles() as $config) {
             try {
                 $mapping = $this->bower->getDependencyMapping($config);
-            } catch(FileNotFoundException $ex) {
+            } catch (FileNotFoundException $ex) {
                 throw $ex;
             } catch (RuntimeException $ex) {
                 throw new RuntimeException('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
@@ -131,69 +134,31 @@ class BowerResource extends ConfigurationResource implements \Serializable
     }
 
     /**
-     * @param array $packageCssFilters
+     * @param PackageResource $packageResource
      *
      * @return $this
      */
-    public function setPackageCssFilters(array $packageCssFilters)
+    public function addPackageResource(PackageResource $packageResource)
     {
-        $this->packageCssFilters = $packageCssFilters;
+        $this->packageResources->set($packageResource->getName(), $packageResource);
 
         return $this;
     }
 
     /**
-     * @param string $packageName
-     * @param array  $filters
-     *
-     * @return $this
+     * @param boolean $nestDependencies
      */
-    public function addPackageCssFilters($packageName, array $filters)
+    public function setNestDependencies($nestDependencies)
     {
-        $this->packageCssFilters[$packageName] = $filters;
-
-        return $this;
+        $this->nestDependencies = $nestDependencies;
     }
 
     /**
-     * @return array
+     * @return boolean
      */
-    public function getPackageCssFilters()
+    public function shouldNestDependencies()
     {
-        return $this->packageCssFilters;
-    }
-
-    /**
-     * @param array $packageJsFilters
-     *
-     * @return $this
-     */
-    public function setPackageJsFilters(array $packageJsFilters)
-    {
-        $this->packageJsFilters = $packageJsFilters;
-
-        return $this;
-    }
-
-    /**
-     * @param string $packageName
-     * @param array  $filters
-     *
-     * @return $this
-     */
-    public function addPackageJsFilters($packageName, array $filters)
-    {
-        $this->packageJsFilters[$packageName] = $filters;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPackageJsFilters()
-    {
-        return $this->packageJsFilters;
+        return $this->nestDependencies;
     }
 
     /**
@@ -202,6 +167,22 @@ class BowerResource extends ConfigurationResource implements \Serializable
     public function __toString()
     {
         return 'bower';
+    }
+
+    /**
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        list($this->cssFilters, $this->jsFilter, $this->packageResources, $this->packageCssFilters) = unserialize($serialized);
+    }
+
+    /**
+     * @return string
+     */
+    public function serialize()
+    {
+        return serialize(array($this->cssFilters, $this->jsFilters, $this->packageResources, $this->packageCssFilters));
     }
 
     /**
@@ -217,64 +198,58 @@ class BowerResource extends ConfigurationResource implements \Serializable
     {
         $formulae = array();
 
+        /** @var PackageResource $packageResource */
+        $packageResource = $this->packageResources->get($packageName);
         $cssFiles = $package->getStyles()->toArray();
         $jsFiles = $package->getScripts()->toArray();
-        /** @var $packageDependency Package */
-        foreach ($package->getDependencies() as $packageDependency) {
-            $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-            array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
-            array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
+
+        $nestDependencies = $this->shouldNestDependencies();
+        if (null !== $packageResource && null !== $packageResource->shouldNestDependencies()) {
+            $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageName), array());
-        $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageName), array());
+        if ($nestDependencies) {
+            /** @var $packageDependency Package */
+            foreach ($package->getDependencies() as $packageDependency) {
+                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
+                array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
+                array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
+            }
+        }
+
+        $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
+        $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
 
         return $formulae;
     }
 
     /**
-     * @param string $packageName
+     * @param PackageResource|null $packageResource
      *
      * @return array
      */
-    protected function resolveCssFilters($packageName)
+    protected function resolveCssFilters(PackageResource $packageResource = null)
     {
         $cssFilters = $this->getCssFilters();
-        if (isset($this->packageCssFilters[$packageName])) {
-            $cssFilters = array_merge($cssFilters, $this->packageCssFilters[$packageName]);
+        if (null !== $packageResource) {
+            $cssFilters = array_merge($cssFilters, $packageResource->getCssFilters()->toArray());
         }
 
         return $cssFilters;
     }
 
     /**
-     * @param string $packageName
+     * @param PackageResource|null $packageResource
      *
      * @return array
      */
-    protected function resolveJsFilters($packageName)
+    protected function resolveJsFilters(PackageResource $packageResource = null)
     {
         $jsFilters = $this->getJsFilters();
-        if (isset($this->packageJsFilters[$packageName])) {
-            $jsFilters = array_merge($jsFilters, $this->packageJsFilters[$packageName]);
+        if (null !== $packageResource) {
+            $jsFilters = array_merge($jsFilters, $packageResource->getJsFilters()->toArray());
         }
 
         return $jsFilters;
-    }
-
-    /**
-     * @return string
-     */
-    public function serialize()
-    {
-        return serialize(array($this->cssFilters, $this->jsFilters, $this->packageJsFilters, $this->packageCssFilters));
-    }
-
-    /**
-     * @param string $serialized
-     */
-    public function unserialize($serialized)
-    {
-        list($this->cssFilters, $this->jsFilter, $this->packageJsFilters, $this->packageCssFilters) = unserialize($serialized);
     }
 }

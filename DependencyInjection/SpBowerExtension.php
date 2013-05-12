@@ -12,7 +12,9 @@
 namespace Sp\BowerBundle\DependencyInjection;
 
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
@@ -78,10 +80,58 @@ class SpBowerExtension extends Extension
         $resourceDefinition = $container->getDefinition('sp_bower.assetic.bower_resource');
         $resourceDefinition->addMethodCall('setJsFilters', array($config['assetic']['filters']['js']));
         $resourceDefinition->addMethodCall('setCssFilters', array($config['assetic']['filters']['css']));
-        foreach ($config['assetic']['filters']['packages'] as $packageName => $filters) {
-            $resourceDefinition->addMethodCall('addPackageCssFilters', array($packageName, $filters['css']));
-            $resourceDefinition->addMethodCall('addPackageJsFilters', array($packageName, $filters['js']));
+        $resourceDefinition->addMethodCall('setNestDependencies', array($config['assetic']['nest_dependencies']['all']));
+        unset($config['assetic']['nest_dependencies']['all']);
+
+        $this->processPackageFilters($container, $config['assetic']['filters']['packages']);
+        $this->processPackageNestDependencies($container    , $config['assetic']['nest_dependencies']);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $nestDependencies
+     */
+    protected function processPackageNestDependencies(ContainerBuilder $container, array $nestDependencies)
+    {
+        foreach ($nestDependencies as $packageName => $enabled) {
+            $definition = $this->createPackageResource($container, $packageName);
+            $definition->addMethodCall('setNestDependencies', array($enabled));
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $packageFilters
+     */
+    protected function processPackageFilters(ContainerBuilder $container, array $packageFilters)
+    {
+        foreach ($packageFilters as $packageName => $filters) {
+            $definition = $this->createPackageResource($container, $packageName);
+            $definition->addMethodCall('setCssFilters', array($filters['css']));
+            $definition->addMethodCall('setJsFilters', array($filters['js']));
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $packageName
+     *
+     * @return Definition
+     */
+    protected function createPackageResource(ContainerBuilder $container, $packageName)
+    {
+        $packageResourceId = sprintf("sp_bower.assetic.%s_package_resource", $packageName);
+        if ($container->hasDefinition($packageResourceId)) {
+            return $container->getDefinition($packageResourceId);
+        }
+
+        $definition = new Definition('%sp_bower.assetic.package_resource.class%', array($packageName));
+        $container->setDefinition($packageResourceId, $definition);
+
+        $resourceDefinition = $container->getDefinition('sp_bower.assetic.bower_resource');
+        $resourceDefinition->addMethodCall('addPackageResource', array(new Reference($packageResourceId)));
+
+        return $definition;
     }
 
     protected function loadBundlesInformation($bundles, ContainerBuilder $container)
