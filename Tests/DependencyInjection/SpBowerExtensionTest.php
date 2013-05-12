@@ -297,9 +297,9 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
             if ($methodCall[0] == $name) {
                 foreach ($methodCall[1] as $key => $parameter) {
                     $this->assertEquals($expectedValues[$key], $parameter);
-
-                    return;
                 }
+
+                return;
             }
         }
 
