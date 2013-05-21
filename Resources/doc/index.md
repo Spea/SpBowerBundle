@@ -25,20 +25,11 @@ Installation
 
 ### Step 1: Download SpBowerBundle using composer
 
-Add SpBowerBundle in your composer.json:
-
-```js
-{
-    "require": {
-        "sp/bower-bundle": "*"
-    }
-}
-```
-
-Now tell composer to download the bundle by running the command:
+Ask composer to add SpBowerBundle in your composer.json
+and to download it by running the command:
 
 ``` bash
-$ php composer.phar update sp/bower-bundle
+$ php composer.phar requireSpBowerBundleSpBowerBundle sp/bower-bundle
 ```
 
 Composer will install the bundle to your project's `vendor/sp` directory.
