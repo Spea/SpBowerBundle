@@ -10,7 +10,7 @@ This bundle requires Symfony 2.1+
 
 In order to use this bundle you have to install bower
 
-[Bower Documentation](http://twitter.github.com/bower/)
+[Bower Documentation](http://bower.io/)
 
 Installation
 ------------
