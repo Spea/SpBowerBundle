@@ -29,7 +29,7 @@ Ask composer to add SpBowerBundle in your composer.json
 and to download it by running the command:
 
 ``` bash
-$ php composer.phar requireSpBowerBundleSpBowerBundle sp/bower-bundle
+$ php composer.phar require SpBowerBundleSpBowerBundle sp/bower-bundle
 ```
 
 Composer will install the bundle to your project's `vendor/sp` directory.
