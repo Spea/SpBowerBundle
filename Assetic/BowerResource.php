@@ -174,7 +174,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
      */
     public function unserialize($serialized)
     {
-        list($this->cssFilters, $this->jsFilter, $this->packageResources, $this->packageCssFilters) = unserialize($serialized);
+        list($this->cssFilters, $this->jsFilter, $this->packageResources) = unserialize($serialized);
     }
 
     /**
@@ -182,7 +182,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
      */
     public function serialize()
     {
-        return serialize(array($this->cssFilters, $this->jsFilters, $this->packageResources, $this->packageCssFilters));
+        return serialize(array($this->cssFilters, $this->jsFilters, $this->packageResources));
     }
 
     /**
