@@ -4,10 +4,11 @@ SpBowerBundle Image/Font Processing
 Some packages include images or fonts in their css files. Due to the nature of assetic, the path to
 the images/fonts will not be resolved correctly when using the generated assetic resources from this bundle.
 
-But there are two workarounds for this issue:
+But there are trhee workarounds for this issue:
 
 1. Use the cssembed filter from assetic
 2. Use the cssrewrite filter with an own resource
+3. Use the FkrCssURLRewriteBundle
 
 For all examples we will use the following `component.json` with a default `sp_bower` configuration.
 
@@ -83,3 +84,7 @@ Since we now have a valid assetic resource, we can use it in our twig template:
 {% endstylesheets %}
 ```
 
+### 3. Use the FkrCssURLRewriteBundle
+
+The [FkrCssURLRewriteBundle](https://github.com/fkrauthan/FkrCssURLRewriteBundle) resolves the issue by adding
+new filter which can be configured in your config. Just follow the installation instructions and take a look at the usage.
