@@ -13,6 +13,7 @@ namespace Sp\BowerBundle\Bower;
 
 use Doctrine\Common\Cache\Cache;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Sp\BowerBundle\Bower\Exception\MappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
@@ -86,6 +87,7 @@ class Bower
      * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
      *
      * @throws Exception\MappingException
+     * @throws Exception\InvalidMappingException
      * @return Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
@@ -98,7 +100,7 @@ class Bower
 
         $mapping = json_decode($output, true);
         if (null === $mapping) {
-            throw new MappingException('Bower returned an invalid dependency mapping. This mostly happens when the dependencies are not yet installed or if you are using an old version of bower.');
+            throw new InvalidMappingException('Bower returned an invalid dependency mapping. This mostly happens when the dependencies are not yet installed or if you are using an old version of bower.');
         }
 
         $cacheKey = $this->createCacheKey($result->getConfig());

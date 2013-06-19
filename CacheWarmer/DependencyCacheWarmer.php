@@ -13,6 +13,7 @@ namespace Sp\BowerBundle\CacheWarmer;
 
 use Sp\BowerBundle\Bower\Bower;
 use Sp\BowerBundle\Bower\BowerManager;
+use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -64,7 +65,9 @@ class DependencyCacheWarmer implements CacheWarmerInterface
             if ($this->install) {
                 $this->bower->install($config);
             } else {
-                $this->bower->createDependencyMappingCache($config);
+                try {
+                    $this->bower->createDependencyMappingCache($config);
+                } catch (InvalidMappingException $ex) {}
             }
         }
     }

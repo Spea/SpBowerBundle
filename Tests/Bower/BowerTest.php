@@ -134,7 +134,7 @@ class BowerTest extends AbstractBowerTest
     }
 
     /**
-     * @expectedException \Sp\BowerBundle\Bower\Exception\MappingException
+     * @expectedException \Sp\BowerBundle\Bower\Exception\InvalidMappingException
      */
     public function testCreateDependencyMappingCacheWithInvalidMapping()
     {
