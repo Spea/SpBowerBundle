@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.8-dev
+
+...
+
 ### 0.7 (2013-06-20)
 
 * Added support for ```scripts``` and ```styles``` properties in the component.json file. As used in node
