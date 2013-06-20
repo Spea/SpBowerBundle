@@ -1,12 +1,13 @@
 Changelog
 =========
 
-### 0.7-dev
+### 0.7 (2013-06-20)
 
 * Added support for ```scripts``` and ```styles``` properties in the component.json file. As used in node
 * Throw an exception instead of deleting the cache when the dependency mapping returned from bower is invalid
 * Added documentation on how to process images/fonts in css files
 * Added new option `assetic.nest_dependencies` to configure the behavior of nested dependencies in the generated assetic resources
+* Added new command for warming up cache
 * Catch invalid mapping exception in cache warmer
 
 ### 0.6 (2013-04-06)
