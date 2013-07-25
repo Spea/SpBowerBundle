@@ -92,7 +92,7 @@ class Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
     {
-        $result = $this->execCommand($config, array('list', '--map'));
+        $result = $this->execCommand($config, array('list', '--map', '--json'));
         $output = $result->getProcess()->getOutput();
         if (strpos($output, 'error')) {
             throw new MappingException(sprintf('An error occurred while creating dependency mapping. The error was %s.', $output));
