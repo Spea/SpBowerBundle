@@ -81,8 +81,7 @@ class DependencyMapper implements DependencyMapperInterface
     {
         $this->config = $config;
         $packagesInfo = $this->orderPackages($packagesInfo);
-
-        foreach ($packagesInfo as $packageName => $packageInfo) {
+        foreach ($packagesInfo[self::DEPENDENCIES_KEY] as $packageName => $packageInfo) {
             $package = $this->createPackage($packageName, $packageInfo);
             $this->packages->set($packageName, $package);
         }
@@ -200,7 +199,7 @@ class DependencyMapper implements DependencyMapperInterface
     private function orderPackages(array $packagesInfo)
     {
         $dependenciesKey = self::DEPENDENCIES_KEY;
-        uasort($packagesInfo, function($first, $second) use($dependenciesKey) {
+        uasort($packagesInfo[self::DEPENDENCIES_KEY], function($first, $second) use($dependenciesKey) {
             $firstCount = isset($first[$dependenciesKey]) ? count($first[$dependenciesKey]) : 0;
             $secondCount = isset($second[$dependenciesKey]) ? count($second[$dependenciesKey]) : 0;
 

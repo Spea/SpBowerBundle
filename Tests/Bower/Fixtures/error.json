@@ -1,0 +1,17 @@
+[{
+    "level": "warn",
+    "id": "deprecated",
+    "message": "You are using the deprecated component.json file",
+    "data": {
+        "json": "foo"
+    }
+}, {
+    "code": "EINVALID",
+    "details": "No name property set",
+    "data": {
+        "filename": "component.json"
+    },
+    "id": "EINVALID",
+    "level": "error",
+    "message": "Something went wrong while reading component.json"
+}]

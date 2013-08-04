@@ -12,6 +12,8 @@
 namespace Sp\BowerBundle\Bower;
 
 use Doctrine\Common\Cache\Cache;
+use Sp\BowerBundle\Bower\Exception\CommandException;
+use Sp\BowerBundle\Bower\Exception\Error;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
 use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Sp\BowerBundle\Bower\Exception\MappingException;
@@ -19,6 +21,7 @@ use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
@@ -76,7 +79,7 @@ class Bower
      */
     public function install(ConfigurationInterface $config, $callback = null)
     {
-        $result = $this->execCommand($config, 'install', $callback);
+        $result = $this->execCommand($config, array('install'), $callback);
 
         return $result->getProcess()->getExitCode();
     }
@@ -92,11 +95,8 @@ class Bower
      */
     public function createDependencyMappingCache(ConfigurationInterface $config)
     {
-        $result = $this->execCommand($config, array('list', '--map'));
+        $result = $this->execCommand($config, array('list', '--json'));
         $output = $result->getProcess()->getOutput();
-        if (strpos($output, 'error')) {
-            throw new MappingException(sprintf('An error occurred while creating dependency mapping. The error was %s.', $output));
-        }
 
         $mapping = json_decode($output, true);
         if (null === $mapping) {
@@ -187,7 +187,7 @@ class Bower
      * @param string|array               $commands
      * @param \Closure|string|array|null $callback
      *
-     * @throws Exception\RuntimeException
+     * @throws Exception\CommandException
      * @return BowerResult
      */
     private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
@@ -214,11 +214,7 @@ class Bower
         $proc->run($callback);
 
         if (!$proc->isSuccessful()) {
-            throw new RuntimeException(sprintf(
-                'An error occurred while executing the command %s. The error was: "%s"',
-                $proc->getCommandLine(),
-                trim($proc->getErrorOutput())
-            ));
+            throw new CommandException($proc->getCommandLine(),trim($proc->getErrorOutput()));
         }
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));

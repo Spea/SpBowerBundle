@@ -96,7 +96,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $configDefinition = $calls[0][1][1];
         $configCalls = $configDefinition->getMethodCalls();
         $this->assertEquals($this->demoBundlePath .'/Resources/config/bower/../../public/components', $configCalls[0][1][0]);
-        $this->assertEquals('component.json', $configCalls[1][1][0]);
+        $this->assertEquals('bower.json', $configCalls[1][1][0]);
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
     }
 

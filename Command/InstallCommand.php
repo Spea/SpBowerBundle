@@ -11,9 +11,12 @@
 
 namespace Sp\BowerBundle\Command;
 
+use Sp\BowerBundle\Bower\Exception\CommandException;
+use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -38,12 +41,19 @@ EOT
         $bowerManager = $this->getBowerManager();
         $bower = $this->getBower();
         $callback = function($type, $data) use ($output) {
-            $output->write($data);
+            if (Process::ERR != $type) {
+                $output->write($data);
+            }
         };
 
         foreach ($bowerManager->getBundles() as $bundle => $configuration) {
             $output->writeln(sprintf('Installing bower dependencies for <comment>"%s"</comment> into <comment>"%s"</comment>', $bundle, $configuration->getAssetDirectory()));
-            $bower->install($configuration, $callback);
+            try {
+                $bower->install($configuration, $callback);
+            } catch (CommandException $ex) {
+                $output->writeln($ex->getCommandError());
+                throw new RuntimeException("An error occured while installing dependencies");
+            }
         }
     }
 

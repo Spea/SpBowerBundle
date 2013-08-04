@@ -118,7 +118,7 @@ class BowerTest extends AbstractBowerTest
         $this->processBuilder->expects($this->once())->method('setTimeout')->with($this->equalTo(600));
         $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo($this->bin));
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('list'));
-        $this->processBuilder->expects($this->at(4))->method('add')->with($this->equalTo('--map'));
+        $this->processBuilder->expects($this->at(4))->method('add')->with($this->equalTo('--json'));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
         $this->bower->expects($this->once())->method('dumpBowerConfig');
@@ -167,10 +167,12 @@ class BowerTest extends AbstractBowerTest
      */
     public function testUnsuccessfulInstallThrowsRuntimeException()
     {
+        $jsonString = file_get_contents(self::$fixturesDirectory .'/error.json');
         $configDir = "/config_dir";
         $config = new Configuration($configDir);
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(false));
+        $this->process->expects($this->once())->method('getErrorOutput')->will($this->returnValue($jsonString));
 
         $this->bower->install($config);
     }

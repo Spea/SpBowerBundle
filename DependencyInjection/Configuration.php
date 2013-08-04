@@ -94,7 +94,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('config_dir')->defaultValue('Resources/config/bower')->end()
                             ->scalarNode('asset_dir')->defaultValue('../../public/components')->end()
-                            ->scalarNode('json_file')->defaultValue('component.json')->end()
+                            ->scalarNode('json_file')->defaultValue('bower.json')->end()
                             ->scalarNode('endpoint')->defaultValue('https://bower.herokuapp.com')->end()
                         ->end()
                     ->end()
