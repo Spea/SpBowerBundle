@@ -3,7 +3,7 @@ Changelog
 
 ### 0.8-dev
 
-...
+* Made bundle compatible with bower >= 1.0.0
 
 ### 0.7 (2013-06-20)
 

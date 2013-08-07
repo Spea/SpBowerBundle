@@ -117,8 +117,8 @@ class DependencyMapper implements DependencyMapperInterface
     {
         $files = array();
         foreach ($this->fileMapping[$type]['keys'] as $key) {
-            if (isset($packageInfo['source'][$key])) {
-                $extractedFiles = $this->extractFiles($packageInfo['source'][$key], $this->fileMapping[$type]['extensions']);
+            if (isset($packageInfo['pkgMeta'][$key])) {
+                $extractedFiles = $this->extractFiles($packageInfo['canonicalDir'], $packageInfo['pkgMeta'][$key], $this->fileMapping[$type]['extensions']);
                 $files = array_merge($files, $extractedFiles);
             }
         }
@@ -127,12 +127,13 @@ class DependencyMapper implements DependencyMapperInterface
     }
 
     /**
+     * @param string $canonicalDir
      * @param string|array $files
      * @param array $extensions
      *
      * @return array
      */
-    private function extractFiles($files, array $extensions)
+    private function extractFiles($canonicalDir, $files, array $extensions)
     {
         if (!is_array($files)) {
             $files = array($files);
@@ -141,7 +142,7 @@ class DependencyMapper implements DependencyMapperInterface
         $matchedFiles = array();
         foreach ($files as $file) {
             if (in_array(pathinfo($file, PATHINFO_EXTENSION), $extensions)) {
-                $matchedFiles[] = $this->resolvePath($file);
+                $matchedFiles[] = $this->resolvePath($canonicalDir . DIRECTORY_SEPARATOR . $file);
             }
         }
 
@@ -164,7 +165,7 @@ class DependencyMapper implements DependencyMapperInterface
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if (!file_exists($file) && in_array($extension, $this->requiredExtensions)) {
             throw new FileNotFoundException(
-                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $this->config->getDirectory() . "/" . $file)
+                sprintf('The required file "%s" could not be found. Did you accidentally deleted the "components" directory?', $file)
             );
         }
 

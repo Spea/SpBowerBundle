@@ -1,75 +1,80 @@
 <?php
 return array(
-    "other_package" => array(
-        "source" => array(
-            "main" => array(
-                "../components/other_package/styles.css",
-                "../components/other_package/script.js"
+    "dependencies" => array(
+        "other_package" => array(
+            "canonicalDir" => "../components/other_package",
+            "pkgMeta" => array(
+                "main" => array(
+                    "styles.css",
+                    "script.js"
+                ),
+                "scripts" => array(
+                    "main.js",
+                    "customized.js",
+                ),
+                "styles" => array(
+                    "main.css",
+                    "customized.css",
+                ),
             ),
-            "scripts" => array(
-                "../components/other_package/main.js",
-                "../components/other_package/customized.js",
-            ),
-            "styles" => array(
-                "../components/other_package/main.css",
-                "../components/other_package/customized.css",
-            ),
-        ),
-        "dependencies" => array(
-            "package" => array(
-                "source" => array(
-                    "main" => "../components/package/package.js"
+            "dependencies" => array(
+                "package" => array(
+                    "pkgMeta" => array(
+                        "main" => "package.js"
+                    )
                 )
             )
-        )
-    ),
-    "package" => array(
-        "source" => array(
-            "main" => "../components/package/package.js"
-        )
-    ),
-    "dependency_package" => array(
-        "source" => array(
-            "main" => array(
-                "../components/dependency_package/script.js",
-                "../components/dependency_package/utils.js",
-                "../components/dependency_package/styles.css",
-                "../components/dependency_package/navigation.css",
-            ),
-            "scripts" => array(
-                "../components/dependency_package/script.js",
-                "../components/dependency_package/utils.js",
-            ),
-            "styles" => array(
-                "../components/dependency_package/styles.css",
-                "../components/dependency_package/navigation.css"
+        ),
+        "package" => array(
+            "canonicalDir" => "../components/package",
+            "pkgMeta" => array(
+                "main" => "package.js"
             )
         ),
-        "dependencies" => array(
-            "package" => array(
-                "source" => array(
-                    "main" => "../components/package/package.js",
+        "dependency_package" => array(
+            "canonicalDir" => "../components/dependency_package",
+            "pkgMeta" => array(
+                "main" => array(
+                    "script.js",
+                    "utils.js",
+                    "styles.css",
+                    "navigation.css",
                 ),
+                "scripts" => array(
+                    "script.js",
+                    "utils.js",
+                ),
+                "styles" => array(
+                    "styles.css",
+                    "navigation.css"
+                )
             ),
-            "other_package" => array(
-                "source" => array(
-                    "main" => array(
-                        "../components/other_package/styles.css",
-                        "../components/other_package/script.js",
+            "dependencies" => array(
+                "package" => array(
+                    "pkgMeta" => array(
+                        "main" => "package.js",
                     ),
-                    "scripts" => array(
-                        "../components/other_package/main.js",
-                        "../components/other_package/customized.js"
-                    ),
-                    "styles" => array(
-                        "../components/other_package/main.css",
-                        "../components/other_package/customized.css"
-                    )
                 ),
+                "other_package" => array(
+                    "pkgMeta" => array(
+                        "main" => array(
+                            "styles.css",
+                            "script.js",
+                        ),
+                        "scripts" => array(
+                            "main.js",
+                            "customized.js"
+                        ),
+                        "styles" => array(
+                            "main.css",
+                            "customized.css"
+                        )
+                    ),
+                )
             )
-        )
-    ),
-    "invalid-package_name" => array(),
-    "boo_package" => array(
-    ),
+        ),
+        "invalid-package_name" => array(),
+        "boo_package" => array(
+        ),
+    )
 );

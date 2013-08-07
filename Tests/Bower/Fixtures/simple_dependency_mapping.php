@@ -1,7 +1,7 @@
 <?php
 return array(
     "package" => array(
-        "source" => array(
+        "pkgMeta" => array(
             "main" => array(
                 "../components/package/styles.css",
                 "../components/package/script.js",
