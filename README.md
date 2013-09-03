@@ -11,7 +11,7 @@ Features included:
 
 **Caution:** This bundle is developed in sync with [symfony's repository](https://github.com/symfony/symfony).
 
-**Note:** The master branch only works if you are using bower >= 1.0.0. For bower < 1.0.0 you must use <= 0.7 from this bundle.
+**Note:** The master branch only works if you are using bower >= 1.0.0. For bower < 1.0.0 you must use <= 0.7 from this bundle. Also take a look at the [upgrade instructions](Upgrade.md)
 
 **Note:** The configuration for this bundle slightly changed from 0.1 to 0.2, please take a look at the [upgrade notes](https://github.com/Spea/SpBowerBundle/blob/master/Upgrade.md)
 

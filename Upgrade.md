@@ -4,6 +4,30 @@ Upgrade instruction
 This document describes the changes needed when upgrading because of a BC
 break. For the full list of changes, please look at the Changelog file.
 
+## 0.7 to 0.8
+
+### Configuration
+
+The default name for the dependency file from bower has changed from `compoment.json` to `bower.json`.
+So if you still want to use the old name, you must adjust the configuration for this bundle
+
+Before:
+
+```
+sp_bower:
+    bundles:
+        AcmeDemoBundle: ~
+```
+
+After:
+
+```
+sp_bower:
+    bundles:
+        AcmeDemoBundle:
+            config_dir: component.json
+```
+
 ## 0.5 to 0.6
 
 ### Exceptions
