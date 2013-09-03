@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.9-dev
+
+...
+
 ### 0.8 (2013-09-03)
 
 * Made bundle compatible with bower >= 1.0.0
