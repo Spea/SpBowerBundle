@@ -11,11 +11,17 @@ Features included:
 
 **Caution:** This bundle is developed in sync with [symfony's repository](https://github.com/symfony/symfony).
 
-**Note:** The master branch only works if you are using bower >= 1.0.0. For bower < 1.0.0 you must use <= 0.7 from this bundle. Also take a look at the [upgrade instructions](Upgrade.md)
+### Bower >= 1.0.0
 
-**Note:** The configuration for this bundle slightly changed from 0.1 to 0.2, please take a look at the [upgrade notes](https://github.com/Spea/SpBowerBundle/blob/master/Upgrade.md)
+Since version [0.8](https://github.com/Spea/SpBowerBundle/releases/tag/v0.8) the bundle fully supports bower `>= 1.0.0`.
+If you used version 0.7 before, you might want to read the [upgrade instructions to 0.8](Upgrade.md#07-to-08).
 
-[![Build Status](https://secure.travis-ci.org/Spea/SpBowerBundle.png?branch=master)](https://travis-ci.org/Spea/SpBowerBundle)
+### Bower < 1.0.0
+
+If you are still using a bower version `< 1.0.0`, you must use a Version lower or equal to
+[0.7](https://github.com/Spea/SpBowerBundle/releases/tag/v0.7) from this bundle.
+
+[![Build Status](https://secure.travis-ci.org/Spea/SpBowerBundle.png?branch=master)](https://travis-ci.org/Spea/SpBowerBundle) [![Latest Stable Version](https://poser.pugx.org/sp/bower-bundle/v/stable.png)](https://packagist.org/packages/sp/bower-bundle) [![Total Downloads](https://poser.pugx.org/sp/bower-bundle/downloads.png)](https://packagist.org/packages/sp/bower-bundle)
 
 Documentation
 -------------
