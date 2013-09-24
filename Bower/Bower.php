@@ -13,14 +13,12 @@ namespace Sp\BowerBundle\Bower;
 
 use Doctrine\Common\Cache\Cache;
 use Sp\BowerBundle\Bower\Exception\CommandException;
-use Sp\BowerBundle\Bower\Exception\Error;
-use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
 use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Sp\BowerBundle\Bower\Exception\MappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -45,7 +43,7 @@ class Bower
     protected $dependencyCache;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -55,12 +53,12 @@ class Bower
     protected $dependencyMapper;
 
     /**
-     * @param string                                             $bowerPath
-     * @param \Doctrine\Common\Cache\Cache                       $dependencyCache
-     * @param \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher
-     * @param Package\DependencyMapperInterface                  $dependencyMapper
+     * @param string                                                      $bowerPath
+     * @param \Doctrine\Common\Cache\Cache                                $dependencyCache
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+     * @param Package\DependencyMapperInterface                           $dependencyMapper
      */
-    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcher $eventDispatcher,
+    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcherInterface $eventDispatcher,
                                 DependencyMapperInterface $dependencyMapper = null)
     {
         $this->bowerPath = $bowerPath;

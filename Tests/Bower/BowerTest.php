@@ -68,7 +68,7 @@ class BowerTest extends AbstractBowerTest
     {
         $this->target = sys_get_temp_dir() .'/bower_install';
         $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->dependencyMapper = $this->getMock('Sp\BowerBundle\Bower\Package\DependencyMapperInterface');
         $this->bower = $this->getMock(
             'Sp\BowerBundle\Bower\Bower',
