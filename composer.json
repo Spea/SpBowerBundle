@@ -24,6 +24,7 @@
     },
     "require-dev":{
         "symfony/console": "~2.1",
+        "doctrine/collections": "1.*",
         "phpunit/phpunit": "3.7.*"
     },
     "config": {

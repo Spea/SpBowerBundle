@@ -52,6 +52,8 @@ class Bower
      */
     protected $dependencyMapper;
 
+    protected $offline;
+
     /**
      * @param string                                                      $bowerPath
      * @param \Doctrine\Common\Cache\Cache                                $dependencyCache
@@ -59,12 +61,13 @@ class Bower
      * @param Package\DependencyMapperInterface                           $dependencyMapper
      */
     public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcherInterface $eventDispatcher,
-                                DependencyMapperInterface $dependencyMapper = null)
+                                DependencyMapperInterface $dependencyMapper = null, $offline = false)
     {
         $this->bowerPath = $bowerPath;
         $this->dependencyCache = $dependencyCache;
         $this->eventDispatcher = $eventDispatcher;
         $this->dependencyMapper = $dependencyMapper ?: new DependencyMapper();
+        $this->offline = $offline;
     }
 
     /**
@@ -204,6 +207,9 @@ class Bower
         $pb->setWorkingDirectory($config->getDirectory());
         $pb->setTimeout(600);
         $pb->add($this->bowerPath);
+        if ($this->offline) {
+            $pb->add('--offline');
+        }
         foreach ($commands as $command) {
             $pb->add($command);
         }
