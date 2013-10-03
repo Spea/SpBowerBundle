@@ -62,6 +62,7 @@ class Bower
      * @param \Doctrine\Common\Cache\Cache                                $dependencyCache
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      * @param Package\DependencyMapperInterface                           $dependencyMapper
+     * @param boolean                                                     $offline
      */
     public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcherInterface $eventDispatcher,
                                 DependencyMapperInterface $dependencyMapper = null, $offline = false)
