@@ -9,6 +9,7 @@ sp_bower:
     install_on_warmup: false # Optional
     keep_bowerrc: false # Optional
     bin: /usr/bin/bower # Optional
+    offline: false # optional
     # assetic: ~
     assetic:
         enabled: true
@@ -32,3 +33,7 @@ sp_bower:
             json_file: component.json
             endpoint: https://bower.herokuapp.com
 ```
+
+
+Set the `offline` option in situations where you do not have internet capabilities 
+for example on a plane or your local pub.

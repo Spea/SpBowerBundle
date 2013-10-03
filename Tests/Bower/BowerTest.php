@@ -73,7 +73,7 @@ class BowerTest extends AbstractBowerTest
         $this->bower = $this->getMock(
             'Sp\BowerBundle\Bower\Bower',
             array('dumpBowerConfig'),
-            array($this->bin, $this->cache, $this->eventDispatcher, $this->dependencyMapper, false)
+            array($this->bin, $this->cache, $this->eventDispatcher, $this->dependencyMapper)
         );
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);

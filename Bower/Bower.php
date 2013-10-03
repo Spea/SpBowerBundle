@@ -52,6 +52,9 @@ class Bower
      */
     protected $dependencyMapper;
 
+    /**
+     * @var boolean true if bower should operate in offline mode
+     */
     protected $offline;
 
     /**
