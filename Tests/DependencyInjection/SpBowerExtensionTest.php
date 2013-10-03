@@ -67,6 +67,23 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertParameter($binPath, 'sp_bower.bower.bin');
     }
 
+    public function testLoadDefaultOffline()
+    {
+        $this->extension->load(array(), $this->container);
+
+        $this->assertParameter(false, 'sp_bower.bower.offline');
+    }
+
+    public function testLoadOffline()
+    {
+        $config = array('sp_bower' => array('offline' => true));
+        $this->extension->load($config, $this->container);
+
+        $this->assertParameter(true, 'sp_bower.bower.offline');
+    }
+
+
+
     public function testLoadDefaults()
     {
         $config = array(
