@@ -46,6 +46,7 @@
             <argument>%sp_bower.bower.bin%</argument>
             <argument type="service" id="sp_bower.filesystem_cache" />
             <argument type="service" id="event_dispatcher" />
+            <argument>null</argument>
             <argument>%sp_bower.bower.offline%</argument>
         </service>
 
