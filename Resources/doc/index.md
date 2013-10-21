@@ -64,7 +64,7 @@ sp_bower:
 
 ### Step 4: Installing bower dependencies
 
-Place your ```component.json``` in the config directory, the default value for the config dir is ```$yourBundle/Resources/config/bower```.
+Place your ```bower.json``` in the config directory, the default value for the config dir is ```$yourBundle/Resources/config/bower```.
 
 #### Example:
 ```json
