@@ -69,6 +69,7 @@ Place your ```bower.json``` in the config directory, the default value for the c
 #### Example:
 ```json
 {
+    "name": "your-bundle-name"
     "dependencies": {
         "jquery": "~1.8.2"
     }
@@ -85,8 +86,9 @@ This bundle registers all installed bower assets automatically for you.
 Lets say you have the following dependencies defined
 
 ```json
-# AcmeDemoBundle/Resources/config/bower/component.json
+# AcmeDemoBundle/Resources/config/bower/bower.json
 {
+    "name": "acme-demo-bundle"
     "dependencies": {
         "bootstrap": "latest"
     }
