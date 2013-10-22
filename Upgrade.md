@@ -25,7 +25,7 @@ After:
 sp_bower:
     bundles:
         AcmeDemoBundle:
-            config_dir: component.json
+            json_file: component.json
 ```
 
 ## 0.5 to 0.6
