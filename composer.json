@@ -4,7 +4,7 @@
     "description": "Handle asset dependencies with bower",
     "keywords": ["asset", "dependencies", "bower manager", "bower"],
     "license": "MIT",
-    "minimum-stability": "alpha",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Martin Parsiegla",
