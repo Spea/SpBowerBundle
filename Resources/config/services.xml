@@ -27,7 +27,7 @@
         </service>
 
         <service id="sp_bower.dependency_cache_warmer" class="%sp_bower.dependency_cache_warmer.class%">
-            <tag name="kernel.cache_warmer" />
+            <tag name="kernel.cache_warmer" priority="20" />
             <argument type="service" id="sp_bower.bower_manager" />
             <argument type="service" id="sp_bower.bower" />
             <argument>%sp_bower.install_on_warmup%</argument>

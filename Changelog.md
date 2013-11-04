@@ -6,6 +6,7 @@ Changelog
 * Added new command to list all assetic resources (`sp:bower:list`)
 * Fixed some typos
 * Adjusted documentation
+* Dependency cache warmer is now optional (so it will not be triggered on a "soft" cache warmup)
 
 ### 0.8 (2013-09-03)
 
