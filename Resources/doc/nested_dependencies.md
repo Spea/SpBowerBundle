@@ -1,7 +1,7 @@
 SpBowerBundle Nested Dependencies
 =================================
 
-By default all automatically registerd asset resources use deep nesting for dependencies, this means that
+By default all automatically registered asset resources use deep nesting for dependencies, this means that
 if you have a package `my_package` which requires the package `jquery`, and you use the assetic resource
 `@my_package_js`, `jquery_js` will be included aswell.
 
