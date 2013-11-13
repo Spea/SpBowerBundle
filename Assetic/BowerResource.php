@@ -94,7 +94,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
             /** @var $package Package */
             foreach ($mapping as $package) {
                 $packageName = $this->namingStrategy->translateName($package->getName());
-                $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
+
+                $packageFormula = $this->createPackageFormulae($package, $packageName, $config->getDirectory());
+                if (!empty($packageFormula)) {
+                    $formulae = array_merge($packageFormula, $formulae);
+                }
             }
         }
 
@@ -200,25 +204,19 @@ class BowerResource extends ConfigurationResource implements \Serializable
 
         /** @var PackageResource $packageResource */
         $packageResource = $this->packageResources->get($packageName);
-        $cssFiles = $package->getStyles()->toArray();
-        $jsFiles = $package->getScripts()->toArray();
 
         $nestDependencies = $this->shouldNestDependencies();
         if (null !== $packageResource && null !== $packageResource->shouldNestDependencies()) {
             $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        if ($nestDependencies) {
-            /** @var $packageDependency Package */
-            foreach ($package->getDependencies() as $packageDependency) {
-                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-                array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
-                array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
-            }
+        if (null !== $cssFiles = $this->createStylesFormula($package, $nestDependencies)) {
+            $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
         }
 
-        $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
-        $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
+        if (null !== $jsFiles = $this->createScriptsFormula($package, $nestDependencies)) {
+            $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
+        }
 
         return $formulae;
     }
@@ -251,5 +249,59 @@ class BowerResource extends ConfigurationResource implements \Serializable
         }
 
         return $jsFilters;
+    }
+
+    /**
+     * Creates formula for styles
+     *
+     * @param Package $package
+     * @param Boolean $nestDependencies
+     *
+     * @return array|null
+     */
+    protected function createStylesFormula(Package $package, $nestDependencies)
+    {
+        $cssFiles = $package->getStyles()->toArray();
+
+        if (empty($cssFiles)) {
+            return null;
+        }
+
+        if ($nestDependencies) {
+            /** @var $packageDependency Package */
+            foreach ($package->getDependencies() as $packageDependency) {
+                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
+                array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
+            }
+        }
+
+        return $cssFiles;
+    }
+
+    /**
+     * Creates formula for scripts
+     *
+     * @param Package $package
+     * @param Boolean $nestDependencies
+     *
+     * @return array|null
+     */
+    protected function createScriptsFormula(Package $package, $nestDependencies)
+    {
+        $jsFiles = $package->getScripts()->toArray();
+
+        if (empty($jsFiles)) {
+            return null;
+        }
+
+        if ($nestDependencies) {
+            /** @var $packageDependency Package */
+            foreach ($package->getDependencies() as $packageDependency) {
+                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
+                array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
+            }
+        }
+
+        return $jsFiles;
     }
 }
