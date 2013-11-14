@@ -17,6 +17,7 @@ use Sp\BowerBundle\Bower\Bower;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\ConfigurationInterface;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\InvalidArgumentException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\Package;
 use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
@@ -210,11 +211,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
             $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        if (null !== $cssFiles = $this->createStylesFormula($package, $nestDependencies)) {
+        if (null !== $cssFiles = $this->createSingleFormula($package, $nestDependencies, 'getStyles', 'css')) {
             $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
         }
 
-        if (null !== $jsFiles = $this->createScriptsFormula($package, $nestDependencies)) {
+        if (null !== $jsFiles = $this->createSingleFormula($package, $nestDependencies, 'getScripts', 'js')) {
             $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
         }
 
@@ -252,18 +253,44 @@ class BowerResource extends ConfigurationResource implements \Serializable
     }
 
     /**
-     * Creates formula for styles
+     * Create single formula for package
      *
      * @param Package $package
      * @param Boolean $nestDependencies
+     * @param string  $typeGetter
+     * @param string  $typeExtension
      *
-     * @return array|null
+     * @return null
+     *
+     * @throws InvalidArgumentException
      */
-    protected function createStylesFormula(Package $package, $nestDependencies)
+    protected function createSingleFormula(Package $package, $nestDependencies, $typeGetter, $typeExtension)
     {
-        $cssFiles = $package->getStyles()->toArray();
+        $validExtensions = array('css', 'js');
+        if (!in_array($typeExtension, $validExtensions)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Extension '%s' is not in list of valid extensions: %s",
+                    $typeExtension,
+                    implode(', ', $validExtensions)
+                )
+            );
+        }
 
-        if (empty($cssFiles)) {
+        $validTypeGetters = array('getScripts', 'getStyles');
+        if (!method_exists($package, $typeGetter)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Getter '%s' is not in list of valid getters: %s",
+                    $typeGetter,
+                    implode(', ', $validTypeGetters)
+                )
+            );
+        }
+
+        $files = $package->{$typeGetter}->toArray();
+
+        if (empty($files)) {
             return null;
         }
 
@@ -271,37 +298,10 @@ class BowerResource extends ConfigurationResource implements \Serializable
             /** @var $packageDependency Package */
             foreach ($package->getDependencies() as $packageDependency) {
                 $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-                array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
+                array_unshift($files, '@' . $packageDependencyName . '_' . $typeExtension);
             }
         }
 
-        return $cssFiles;
-    }
-
-    /**
-     * Creates formula for scripts
-     *
-     * @param Package $package
-     * @param Boolean $nestDependencies
-     *
-     * @return array|null
-     */
-    protected function createScriptsFormula(Package $package, $nestDependencies)
-    {
-        $jsFiles = $package->getScripts()->toArray();
-
-        if (empty($jsFiles)) {
-            return null;
-        }
-
-        if ($nestDependencies) {
-            /** @var $packageDependency Package */
-            foreach ($package->getDependencies() as $packageDependency) {
-                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-                array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
-            }
-        }
-
-        return $jsFiles;
+        return $files;
     }
 }
