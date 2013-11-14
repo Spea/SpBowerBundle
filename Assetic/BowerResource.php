@@ -288,7 +288,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
             );
         }
 
-        $files = $package->{$typeGetter}->toArray();
+        $files = $package->{$typeGetter}()->toArray();
 
         if (empty($files)) {
             return null;
