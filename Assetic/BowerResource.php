@@ -64,6 +64,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $packageResources;
 
     /**
+     * @var array
+     */
+    protected $allowedExtensions = array('css', 'js');
+
+    /**
      * @param \Sp\BowerBundle\Bower\Bower                           $bower
      * @param \Sp\BowerBundle\Bower\BowerManager                    $bowerManager
      * @param \Sp\BowerBundle\Naming\PackageNamingStrategyInterface $namingStrategy
@@ -266,13 +271,12 @@ class BowerResource extends ConfigurationResource implements \Serializable
      */
     protected function createSingleFormula(Package $package, $nestDependencies, $typeGetter, $typeExtension)
     {
-        $validExtensions = array('css', 'js');
-        if (!in_array($typeExtension, $validExtensions)) {
+        if (!in_array($typeExtension, $this->validExtensions)) {
             throw new InvalidArgumentException(
                 sprintf(
                     "Extension '%s' is not in list of valid extensions: %s",
                     $typeExtension,
-                    implode(', ', $validExtensions)
+                    implode(', ', $this->validExtensions)
                 )
             );
         }
@@ -288,6 +292,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
             );
         }
 
+        // fetch the files from the package with the specified getter
         $files = $package->{$typeGetter}()->toArray();
 
         if (empty($files)) {
