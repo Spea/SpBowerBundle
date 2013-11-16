@@ -66,9 +66,14 @@ class BowerResource extends ConfigurationResource implements \Serializable
     /**
      * @var array
      */
-    protected $allowedExtensions = array('css', 'js');
+    protected $typeGetters = array(
+        'css' => 'getStyles',
+        'js'  => 'getScripts'
+    );
 
     /**
+     * Constructor
+     *
      * @param \Sp\BowerBundle\Bower\Bower                           $bower
      * @param \Sp\BowerBundle\Bower\BowerManager                    $bowerManager
      * @param \Sp\BowerBundle\Naming\PackageNamingStrategyInterface $namingStrategy
@@ -216,11 +221,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
             $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        if (null !== $cssFiles = $this->createSingleFormula($package, $nestDependencies, 'getStyles', 'css')) {
+        if (null !== $cssFiles = $this->createSingleFormula($package, $nestDependencies, 'css')) {
             $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
         }
 
-        if (null !== $jsFiles = $this->createSingleFormula($package, $nestDependencies, 'getScripts', 'js')) {
+        if (null !== $jsFiles = $this->createSingleFormula($package, $nestDependencies, 'js')) {
             $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
         }
 
@@ -262,35 +267,25 @@ class BowerResource extends ConfigurationResource implements \Serializable
      *
      * @param Package $package
      * @param Boolean $nestDependencies
-     * @param string  $typeGetter
      * @param string  $typeExtension
      *
      * @return null
      *
      * @throws InvalidArgumentException
      */
-    protected function createSingleFormula(Package $package, $nestDependencies, $typeGetter, $typeExtension)
+    protected function createSingleFormula(Package $package, $nestDependencies, $typeExtension)
     {
-        if (!in_array($typeExtension, $this->validExtensions)) {
+        if (!in_array($typeExtension, array_keys($this->typeGetters))) {
             throw new InvalidArgumentException(
                 sprintf(
                     "Extension '%s' is not in list of valid extensions: %s",
                     $typeExtension,
-                    implode(', ', $this->validExtensions)
+                    implode(', ', array_keys($this->typeGetters))
                 )
             );
         }
 
-        $validTypeGetters = array('getScripts', 'getStyles');
-        if (!method_exists($package, $typeGetter)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Getter '%s' is not in list of valid getters: %s",
-                    $typeGetter,
-                    implode(', ', $validTypeGetters)
-                )
-            );
-        }
+        $typeGetter = $this->typeGetters[$typeExtension];
 
         // fetch the files from the package with the specified getter
         $files = $package->{$typeGetter}()->toArray();
