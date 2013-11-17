@@ -7,6 +7,7 @@ Changelog
 * Fixed some typos
 * Adjusted documentation
 * Dependency cache warmer is now optional (so it will not be triggered on a "soft" cache warmup)
+* Generate Assetic packages only when content for scripts and/or styles isn't empty
 
 ### 0.8 (2013-09-03)
 

@@ -17,6 +17,7 @@ use Sp\BowerBundle\Bower\Bower;
 use Sp\BowerBundle\Bower\BowerManager;
 use Sp\BowerBundle\Bower\ConfigurationInterface;
 use Sp\BowerBundle\Bower\Exception\FileNotFoundException;
+use Sp\BowerBundle\Bower\Exception\InvalidArgumentException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\Package;
 use Sp\BowerBundle\Naming\PackageNamingStrategyInterface;
@@ -63,6 +64,16 @@ class BowerResource extends ConfigurationResource implements \Serializable
     protected $packageResources;
 
     /**
+     * @var array
+     */
+    protected $typeGetters = array(
+        'css' => 'getStyles',
+        'js'  => 'getScripts'
+    );
+
+    /**
+     * Constructor
+     *
      * @param \Sp\BowerBundle\Bower\Bower                           $bower
      * @param \Sp\BowerBundle\Bower\BowerManager                    $bowerManager
      * @param \Sp\BowerBundle\Naming\PackageNamingStrategyInterface $namingStrategy
@@ -94,7 +105,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
             /** @var $package Package */
             foreach ($mapping as $package) {
                 $packageName = $this->namingStrategy->translateName($package->getName());
-                $formulae = array_merge($this->createPackageFormulae($package, $packageName, $config->getDirectory()), $formulae);
+
+                $packageFormula = $this->createPackageFormulae($package, $packageName, $config->getDirectory());
+                if (!empty($packageFormula)) {
+                    $formulae = array_merge($packageFormula, $formulae);
+                }
             }
         }
 
@@ -200,25 +215,19 @@ class BowerResource extends ConfigurationResource implements \Serializable
 
         /** @var PackageResource $packageResource */
         $packageResource = $this->packageResources->get($packageName);
-        $cssFiles = $package->getStyles()->toArray();
-        $jsFiles = $package->getScripts()->toArray();
 
         $nestDependencies = $this->shouldNestDependencies();
         if (null !== $packageResource && null !== $packageResource->shouldNestDependencies()) {
             $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        if ($nestDependencies) {
-            /** @var $packageDependency Package */
-            foreach ($package->getDependencies() as $packageDependency) {
-                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
-                array_unshift($jsFiles, '@' . $packageDependencyName . '_js');
-                array_unshift($cssFiles, '@' . $packageDependencyName . '_css');
-            }
+        if (null !== $cssFiles = $this->createSingleFormula($package, $nestDependencies, 'css')) {
+            $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
         }
 
-        $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
-        $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
+        if (null !== $jsFiles = $this->createSingleFormula($package, $nestDependencies, 'js')) {
+            $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
+        }
 
         return $formulae;
     }
@@ -251,5 +260,48 @@ class BowerResource extends ConfigurationResource implements \Serializable
         }
 
         return $jsFilters;
+    }
+
+    /**
+     * Create single formula for package
+     *
+     * @param Package $package
+     * @param Boolean $nestDependencies
+     * @param string  $typeExtension
+     *
+     * @return null
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function createSingleFormula(Package $package, $nestDependencies, $typeExtension)
+    {
+        if (!in_array($typeExtension, array_keys($this->typeGetters))) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Extension '%s' is not in list of valid extensions: %s",
+                    $typeExtension,
+                    implode(', ', array_keys($this->typeGetters))
+                )
+            );
+        }
+
+        $typeGetter = $this->typeGetters[$typeExtension];
+
+        // fetch the files from the package with the specified getter
+        $files = $package->{$typeGetter}()->toArray();
+
+        if (empty($files)) {
+            return null;
+        }
+
+        if ($nestDependencies) {
+            /** @var $packageDependency Package */
+            foreach ($package->getDependencies() as $packageDependency) {
+                $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
+                array_unshift($files, '@' . $packageDependencyName . '_' . $typeExtension);
+            }
+        }
+
+        return $files;
     }
 }

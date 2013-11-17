@@ -75,13 +75,9 @@ class BowerResourceTest extends AbstractBowerTest
 
         $this->assertArrayHasKey('other_package_css', $formulae);
         $this->assertArrayHasKey('other_package_js', $formulae);
-        $this->assertArrayHasKey('invalid_package_name_js', $formulae);
-        $this->assertArrayHasKey('invalid_package_name_css', $formulae);
-        $this->assertArrayHasKey('package_css', $formulae);
         $this->assertArrayHasKey('package_js', $formulae);
 
         $this->assertContains(self::$fixturesDirectory .'/components/package/package.js', $formulae['package_js'][0]);
-        $this->assertEmpty($formulae['package_css'][0]);
 
         $this->assertContains('@package_css', $formulae['other_package_css'][0]);
         $this->assertContains(self::$fixturesDirectory .'/components/other_package/styles.css', $formulae['other_package_css'][0]);
@@ -103,8 +99,6 @@ class BowerResourceTest extends AbstractBowerTest
     public function testGetContentConsidersStylesProperty()
     {
         $formulae = $this->bowerResource->getContent();
-
-        $this->assertArrayHasKey('package_css', $formulae);
 
         $this->assertContains(self::$fixturesDirectory .'/components/other_package/main.css', $formulae['other_package_css'][0]);
         $this->assertContains(self::$fixturesDirectory .'/components/other_package/customized.css', $formulae['other_package_css'][0]);
@@ -139,7 +133,5 @@ class BowerResourceTest extends AbstractBowerTest
         $this->assertNotContains($packageCssFilter, $formulae['other_package_css'][1]);
 
         $this->assertContains($cssFilter, $formulae['other_package_css'][1]);
-        $this->assertContains($packageCssFilter, $formulae['package_css'][1]);
-        $this->assertNotContains($fooPackageCssFilter, $formulae['package_css'][1]);
     }
 }

@@ -45,10 +45,6 @@ EOT
             foreach ($data[0] as $file) {
                 $output->writeln('  '.$file);
             }
-
-            if (!count($data[0])) {
-                $output->writeln('  ~');
-            }
         }
     }
 
