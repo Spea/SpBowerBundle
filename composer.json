@@ -21,7 +21,8 @@
         "symfony/framework-bundle": "~2.1",
         "symfony/process": "~2.1",
         "doctrine/collections": "1.*",
-        "symfony/assetic-bundle": "~2.1"
+        "symfony/assetic-bundle": "~2.1",
+        "doctrine/cache": "~1.0"
     },
     "require-dev":{
         "symfony/console": "~2.1",
