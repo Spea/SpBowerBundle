@@ -57,7 +57,7 @@ class Bower
      */
     protected $offline;
 
-	/**
+    /**
      * @var boolean true if bower should operate in allow-root mode
      */
     protected $allowRoot;
@@ -68,6 +68,7 @@ class Bower
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      * @param Package\DependencyMapperInterface                           $dependencyMapper
      * @param boolean                                                     $offline
+     * @param boolean                                                     $allowRoot
      */
     public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcherInterface $eventDispatcher,
                                 DependencyMapperInterface $dependencyMapper = null, $offline = false, $allowRoot = false)
