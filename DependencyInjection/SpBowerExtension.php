@@ -57,6 +57,7 @@ class SpBowerExtension extends Extension
         }
         
         $container->setParameter('sp_bower.bower.offline', $config['offline']);
+        $container->setParameter('sp_bower.bower.allow_root', $config['allow_root']);
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
         $this->loadBundlesInformation($config['bundles'], $container);

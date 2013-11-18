@@ -10,6 +10,7 @@ sp_bower:
     keep_bowerrc: false # Optional
     bin: /usr/bin/bower # Optional
     offline: false # optional
+    allow_root: false # optional
     # assetic: ~
     assetic:
         enabled: true

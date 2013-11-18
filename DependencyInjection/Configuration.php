@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bin')->defaultValue(function() use ($finder) { return $finder->find('bower', '/usr/bin/bower'); })->end()
                 ->booleanNode('offline')->defaultValue(false)->end()
+                ->booleanNode('allow_root')->defaultFalse()->end()
                 ->scalarNode('cache_dir')->cannotBeEmpty()->defaultValue('%kernel.cache_dir%/sp_bower')->end()
                 ->booleanNode('install_on_warmup')->defaultFalse()->end()
                 ->booleanNode('keep_bowerrc')->defaultFalse()->end()

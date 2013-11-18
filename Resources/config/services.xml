@@ -17,6 +17,7 @@
         <parameter key="sp_bower.exec_listener.class">Sp\BowerBundle\EventListener\ExecListener</parameter>
         <parameter key="sp_bower.cache_create_listener.class">Sp\BowerBundle\EventListener\CacheCreateListener</parameter>
         <parameter key="sp_bower.bower.offline">0</parameter>
+        <parameter key="sp_bower.bower.allow_root">0</parameter>
     </parameters>
 
     <services>
@@ -48,6 +49,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument>null</argument>
             <argument>%sp_bower.bower.offline%</argument>
+            <argument>%sp_bower.bower.allow_root%</argument>
         </service>
 
         <service id="sp_bower.bower_manager" class="%sp_bower.bower_manager.class%" />
