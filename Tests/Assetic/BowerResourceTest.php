@@ -79,7 +79,7 @@ class BowerResourceTest extends AbstractBowerTest
 
         $this->assertContains(self::$fixturesDirectory .'/components/package/package.js', $formulae['package_js'][0]);
 
-        $this->assertContains('@package_css', $formulae['other_package_css'][0]);
+        $this->assertNotContains('@package_css', $formulae['other_package_css'][0]);
         $this->assertContains(self::$fixturesDirectory .'/components/other_package/styles.css', $formulae['other_package_css'][0]);
         $this->assertEquals($cssFilters, $formulae['other_package_css'][1]);
         $this->assertContains('@package_js', $formulae['other_package_js'][0]);
@@ -126,7 +126,7 @@ class BowerResourceTest extends AbstractBowerTest
 
         $formulae = $this->bowerResource->getContent();
 
-        $this->assertContains('@package_css', $formulae['other_package_css'][0]);
+        $this->assertNotContains('@package_css', $formulae['other_package_css'][0]);
         $this->assertContains($cssFilter, $formulae['other_package_css'][1]);
         $this->assertContains($fooPackageCssFilter, $formulae['other_package_css'][1]);
         $this->assertContains($fooPackageJsFilter, $formulae['other_package_js'][1]);

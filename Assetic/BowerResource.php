@@ -297,6 +297,10 @@ class BowerResource extends ConfigurationResource implements \Serializable
         if ($nestDependencies) {
             /** @var $packageDependency Package */
             foreach ($package->getDependencies() as $packageDependency) {
+                $depFiles = $packageDependency->{$typeGetter}()->toArray();
+                if (empty($depFiles)) {
+                    continue;
+                }
                 $packageDependencyName = $this->namingStrategy->translateName($packageDependency->getName());
                 array_unshift($files, '@' . $packageDependencyName . '_' . $typeExtension);
             }
