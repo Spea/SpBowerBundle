@@ -61,14 +61,12 @@ class DependencyCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        foreach ($this->bowerManager->getBundles() as $bundle => $config) {
-            if ($this->install) {
-                $this->bower->install($config);
-            } else {
-                try {
-                    $this->bower->createDependencyMappingCache($config);
-                } catch (InvalidMappingException $ex) {}
-            }
+        if (!$this->install) {
+            return;
+        }
+
+        foreach ($this->bowerManager->getBundles() as $config) {
+            $this->bower->install($config);
         }
     }
 }

@@ -10,13 +10,13 @@
  */
 
 namespace Sp\BowerBundle\Bower;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
 interface ConfigurationInterface
 {
-
     /**
      * @param string $directory
      *
@@ -57,4 +57,14 @@ interface ConfigurationInterface
      * @return string
      */
     public function getJson();
+
+    /**
+     * @param Cache $cache
+     */
+    public function setCache(Cache $cache);
+
+    /**
+     * @return null|Cache
+     */
+    public function getCache();
 }

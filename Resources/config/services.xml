@@ -22,8 +22,8 @@
 
     <services>
 
-        <service id="sp_bower.filesystem_cache" class="%sp_bower.filesystem_cache.class%">
-            <argument>%kernel.cache_dir%/sp_bower</argument>
+        <service id="sp_bower.filesystem_cache" class="%sp_bower.filesystem_cache.class%" abstract="true" public="false">
+            <argument />
             <argument>.sp_bower.data</argument>
         </service>
 
@@ -45,7 +45,6 @@
 
         <service id="sp_bower.bower" class="%sp_bower.bower.class%">
             <argument>%sp_bower.bower.bin%</argument>
-            <argument type="service" id="sp_bower.filesystem_cache" />
             <argument type="service" id="event_dispatcher" />
             <argument>null</argument>
             <argument>%sp_bower.bower.offline%</argument>

@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Bower;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -45,6 +46,11 @@ class Configuration implements ConfigurationInterface
      * @var string
      */
     protected $endpoint;
+
+    /**
+     * @var null|Cache
+     */
+    protected $cache;
 
     /**
      * Construct.
@@ -145,5 +151,21 @@ class Configuration implements ConfigurationInterface
         });
 
         return json_encode($configuration, JSON_FORCE_OBJECT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCache(Cache $cache = null)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 }

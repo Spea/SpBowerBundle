@@ -11,9 +11,11 @@
 
 namespace Sp\BowerBundle\Tests\Bower;
 
+use Doctrine\Common\Cache\FilesystemCache;
 use Sp\BowerBundle\Bower\Bower;
 use Doctrine\Common\Cache\ArrayCache;
 use Sp\BowerBundle\Bower\Configuration;
+use Sp\BowerBundle\EventListener\CacheCreateListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -22,10 +24,25 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class BowerFunctionalTest extends AbstractBowerTest
 {
+    /**
+     * @var Bower
+     */
     protected $bower;
+
+    /**
+     * @var string
+     */
     protected $target;
+
+    /**
+     * @var Filesystem
+     */
     protected $filesystem;
-    protected $cache;
+
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
 
     public function setUp()
     {
@@ -34,23 +51,55 @@ class BowerFunctionalTest extends AbstractBowerTest
         }
 
         $this->target = sys_get_temp_dir() .'/bower_install_'. uniqid();
-        $this->cache = new ArrayCache();
-        $this->bower = new Bower($_SERVER['BOWER_BIN'], $this->cache, new EventDispatcher());
+        $this->eventDispatcher = new EventDispatcher();
+        $this->bower = new Bower($_SERVER['BOWER_BIN'], $this->eventDispatcher);
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->target);
     }
 
-    public function testFileInstall()
+    /**
+     * @test
+     */
+    public function installShouldCreateComponentsDirectory()
     {
         $src = self::$fixturesDirectory .'/config';
-        $configuration = new Configuration($src);
-        $configuration->setJsonFile('component.json');
-        $configuration->setEndpoint('https://bower.herokuapp.com');
-        $configuration->setAssetDirectory($this->filesystem->makePathRelative($this->target .'/components', $src));
+        $configuration = $this->createConfig($src);
+
         $this->bower->install($configuration);
 
         $this->assertFileExists($this->target .'/components');
         $this->assertFileExists($this->target .'/components/jquery');
         $this->assertFileExists($this->target .'/components/jquery/jquery.js');
+    }
+
+    /**
+     * @test
+     */
+    public function installShouldCreateCacheDir()
+    {
+        $src = self::$fixturesDirectory .'/config';
+
+        $configuration = $this->createConfig($src);
+        $this->eventDispatcher->addSubscriber(new CacheCreateListener($this->bower));
+
+        $this->bower->install($configuration);
+
+        $this->assertFileExists($this->target .'/cache');
+    }
+
+    /**
+     * @param string $src
+     *
+     * @return Configuration
+     */
+    private function createConfig($src)
+    {
+        $configuration = new Configuration($src);
+        $configuration->setJsonFile('component.json');
+        $configuration->setEndpoint('https://bower.herokuapp.com');
+        $configuration->setCache(new FilesystemCache($this->target .'/cache'));
+        $configuration->setAssetDirectory($this->filesystem->makePathRelative($this->target . '/components', $src));
+
+        return $configuration;
     }
 }

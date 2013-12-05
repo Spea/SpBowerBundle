@@ -14,7 +14,6 @@ namespace Sp\BowerBundle\Bower;
 use Doctrine\Common\Cache\Cache;
 use Sp\BowerBundle\Bower\Exception\CommandException;
 use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
-use Sp\BowerBundle\Bower\Exception\MappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
@@ -38,11 +37,6 @@ class Bower
     protected $processBuilder;
 
     /**
-     * @var \Doctrine\Common\Cache\Cache
-     */
-    protected $dependencyCache;
-
-    /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $eventDispatcher;
@@ -64,17 +58,15 @@ class Bower
 
     /**
      * @param string                                                      $bowerPath
-     * @param \Doctrine\Common\Cache\Cache                                $dependencyCache
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      * @param Package\DependencyMapperInterface                           $dependencyMapper
      * @param boolean                                                     $offline
      * @param boolean                                                     $allowRoot
      */
-    public function __construct($bowerPath = '/usr/bin/bower', Cache $dependencyCache, EventDispatcherInterface $eventDispatcher,
+    public function __construct($bowerPath = '/usr/bin/bower', EventDispatcherInterface $eventDispatcher,
                                 DependencyMapperInterface $dependencyMapper = null, $offline = false, $allowRoot = false)
     {
         $this->bowerPath = $bowerPath;
-        $this->dependencyCache = $dependencyCache;
         $this->eventDispatcher = $eventDispatcher;
         $this->dependencyMapper = $dependencyMapper ?: new DependencyMapper();
         $this->offline = $offline;
@@ -116,7 +108,7 @@ class Bower
         }
 
         $cacheKey = $this->createCacheKey($result->getConfig());
-        $this->dependencyCache->save($cacheKey, $mapping);
+        $config->getCache()->save($cacheKey, $mapping);
 
         return $this;
     }
@@ -136,7 +128,8 @@ class Bower
         $config = $event->getConfiguration();
 
         $cacheKey = $this->createCacheKey($config);
-        if (!$this->dependencyCache->contains($cacheKey)) {
+        $dependencyCache = $config->getCache();
+        if (!$dependencyCache->contains($cacheKey)) {
             throw new RuntimeException(sprintf(
                 'Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()
             ));
@@ -144,7 +137,7 @@ class Bower
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, array()));
 
-        $mapping = $this->dependencyCache->fetch($cacheKey);
+        $mapping = $dependencyCache->fetch($cacheKey);
 
         return $this->dependencyMapper->map($mapping, $config);
     }

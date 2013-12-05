@@ -13,8 +13,10 @@ namespace Sp\BowerBundle\Tests\DependencyInjection;
 
 use Sp\BowerBundle\DependencyInjection\SpBowerExtension;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -115,6 +117,10 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->demoBundlePath .'/Resources/config/bower/../../public/components', $configCalls[0][1][0]);
         $this->assertEquals('bower.json', $configCalls[1][1][0]);
         $this->assertEquals('https://bower.herokuapp.com', $configCalls[2][1][0]);
+
+        $cacheDefinition = $this->container->getDefinition('sp_bower.filesystem_cache.demobundle');
+        $argumentCall = $cacheDefinition->getArgument(0);
+        $this->assertEquals($this->demoBundlePath .'/Resources/config/bower/../../public/components/cache', $argumentCall);
     }
 
     public function loadDefaultsShouldEnabledNestDependencies()
@@ -220,6 +226,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
                         'asset_dir' => $this->demoBundlePath .'/Resources/public',
                         'json_file' => 'foo.json',
                         'endpoint' => 'https://bower.example.com',
+                        'cache' => 'foobar'
                     ),
                 ),
             )
@@ -240,6 +247,41 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertMethodCall($configCalls, 'setAssetDirectory', $this->demoBundlePath .'/Resources/public');
         $this->assertMethodCall($configCalls, 'setJsonFile', 'foo.json');
         $this->assertMethodCall($configCalls, 'setEndpoint', 'https://bower.example.com');
+        $this->assertMethodCall($configCalls, 'setCache', array(new Reference('sp_bower.filesystem_cache.demobundle')));
+        $cacheDefinition = $this->container->getDefinition('sp_bower.filesystem_cache.demobundle');
+        $argumentCall = $cacheDefinition->getArgument(0);
+        $this->assertEquals($this->demoBundlePath .'/Resources/config/foobar', $argumentCall);
+    }
+
+    /**
+     * @test
+     */
+    public function loadUserCacheShouldSetReference()
+    {
+        $config = array(
+            'sp_bower' => array(
+                'assetic' => false,
+                'install_on_warmup' => true,
+                'bundles' => array(
+                    'DemoBundle' => array(
+                        'cache' => array(
+                            'id' => 'my.service.id'
+                        )
+                    ),
+                ),
+            )
+        );
+
+        $this->container->setDefinition('my.service.id', new Definition());
+
+        $this->extension->load($config, $this->container);
+
+        $definition = $this->container->getDefinition('sp_bower.bower_manager');
+        $calls = $definition->getMethodCalls();
+
+        $configDefinition = $calls[0][1][1];
+        $configCalls = $configDefinition->getMethodCalls();
+        $this->assertMethodCall($configCalls, 'setCache', array(new Reference('my.service.id')));
     }
 
     /**

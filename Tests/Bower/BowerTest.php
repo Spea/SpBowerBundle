@@ -73,7 +73,7 @@ class BowerTest extends AbstractBowerTest
         $this->bower = $this->getMock(
             'Sp\BowerBundle\Bower\Bower',
             array('dumpBowerConfig'),
-            array($this->bin, $this->cache, $this->eventDispatcher, $this->dependencyMapper)
+            array($this->bin, $this->eventDispatcher, $this->dependencyMapper)
         );
         $this->processBuilder = $this->getMock('Symfony\Component\Process\ProcessBuilder');
         $this->bower->setProcessBuilder($this->processBuilder);
@@ -88,12 +88,13 @@ class BowerTest extends AbstractBowerTest
         $this->bower = $this->getMock(
             'Sp\BowerBundle\Bower\Bower',
             array('dumpBowerConfig'),
-            array($this->bin, $this->cache, $this->eventDispatcher, $this->dependencyMapper, true));
+            array($this->bin, $this->eventDispatcher, $this->dependencyMapper, true));
 
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
 
         $config = new Configuration($configDir);
+        $config->setCache($this->cache);
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--offline'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
@@ -102,8 +103,6 @@ class BowerTest extends AbstractBowerTest
 
         $this->bower->install($config);
     }
-
-
 
     /**
      * @covers Sp\BowerBundle\Bower\Bower::install
@@ -135,6 +134,7 @@ class BowerTest extends AbstractBowerTest
     {
         $configDir = "/config_dir";
         $config = new Configuration($configDir);
+        $config->setCache($this->cache);
 
         $jsonDependencyMapping = file_get_contents(self::$fixturesDirectory .'/dependency_mapping.json');
         $arrayDependencyMapping = require self::$fixturesDirectory .'/dependency_mapping.php';
@@ -165,6 +165,7 @@ class BowerTest extends AbstractBowerTest
     {
         $configDir = "/config_dir";
         $config = new Configuration($configDir);
+        $config->setCache($this->cache);
 
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
@@ -178,6 +179,7 @@ class BowerTest extends AbstractBowerTest
     {
         $configDir = self::$fixturesDirectory ."/config";
         $config = new Configuration($configDir);
+        $config->setCache($this->cache);
         $arrayDependencyMapping = require self::$fixturesDirectory .'/simple_dependency_mapping.php';
 
         $this->cache->expects($this->once())->method('contains')->will($this->returnValue(true));
@@ -195,6 +197,7 @@ class BowerTest extends AbstractBowerTest
         $jsonString = file_get_contents(self::$fixturesDirectory .'/error.json');
         $configDir = "/config_dir";
         $config = new Configuration($configDir);
+        $config->setCache($this->cache);
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(false));
         $this->process->expects($this->once())->method('getErrorOutput')->will($this->returnValue($jsonString));
