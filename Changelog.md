@@ -8,6 +8,7 @@ Changelog
 * Adjusted documentation
 * Dependency cache warmer is now optional (so it will not be triggered on a "soft" cache warmup)
 * Generate Assetic packages only when content for scripts and/or styles isn't empty
+* Create cache directory in the components directory - this way the cache must not be recreated on every cache:warmup/cache:clear
 
 ### 0.8 (2013-09-03)
 
