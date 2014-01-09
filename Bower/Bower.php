@@ -83,7 +83,7 @@ class Bower
      */
     public function install(ConfigurationInterface $config, $callback = null)
     {
-        $result = $this->execCommand($config, array('install'), $callback);
+        $result = $this->execCommand($config, array('update'), $callback);
 
         return $result->getProcess()->getExitCode();
     }
