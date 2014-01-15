@@ -1,7 +1,7 @@
 Changelog
 =========
 
-### 0.9-dev
+### 0.9 (2014-01-15)
 
 * Added new command to list all assetic resources (`sp:bower:list`)
 * Fixed some typos
