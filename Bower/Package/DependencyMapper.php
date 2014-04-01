@@ -157,6 +157,7 @@ class DependencyMapper implements DependencyMapperInterface
      */
     private function resolvePath($file)
     {
+        $resetDir = getcwd();
         chdir($this->config->getDirectory());
         if (strpos($file, '@') === 0) {
             return $file;
@@ -169,7 +170,11 @@ class DependencyMapper implements DependencyMapperInterface
             );
         }
 
-        return realpath($file) ? : "";
+        $path = realpath($file) ? : "";
+
+        chdir($resetDir);
+
+        return $path;
     }
 
     /**
