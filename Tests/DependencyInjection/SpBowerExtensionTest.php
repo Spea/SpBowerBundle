@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -57,12 +58,15 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->extension->load(array(), $this->container);
 
-        $this->assertParameter('/usr/bin/bower', 'sp_bower.bower.bin');
+        $finder = new ExecutableFinder();
+        $bowerLocation = $finder->find('bower', '/usr/bin/bower');
+
+        $this->assertParameter($bowerLocation, 'sp_bower.bower.bin');
     }
 
     public function testLoadUserBin()
     {
-        $binPath = '/usr/local/bin/bower';
+        $binPath = '/some/other/path/to/bower';
         $config = array('sp_bower' => array('bin' => $binPath));
         $this->extension->load($config, $this->container);
 

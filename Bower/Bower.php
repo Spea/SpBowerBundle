@@ -123,11 +123,12 @@ class Bower
      */
     public function getDependencyMapping(ConfigurationInterface $config)
     {
+        $cacheKey = $this->createCacheKey($config);
+
         $event = new BowerEvent($config, array());
         $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
         $config = $event->getConfiguration();
 
-        $cacheKey = $this->createCacheKey($config);
         $dependencyCache = $config->getCache();
         if (!$dependencyCache->contains($cacheKey)) {
             throw new RuntimeException(sprintf(
