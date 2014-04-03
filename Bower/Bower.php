@@ -11,14 +11,15 @@
 
 namespace Sp\BowerBundle\Bower;
 
-use Doctrine\Common\Cache\Cache;
+use Sp\BowerBundle\Bower\Event\BowerCommandEvent;
+use Sp\BowerBundle\Bower\Event\BowerEvent;
+use Sp\BowerBundle\Bower\Event\BowerEvents;
 use Sp\BowerBundle\Bower\Exception\CommandException;
 use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
@@ -83,7 +84,11 @@ class Bower
      */
     public function install(ConfigurationInterface $config, $callback = null)
     {
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL, new BowerEvent($config));
+
         $result = $this->execCommand($config, array('install'), $callback);
+
+        $this->eventDispatcher->dispatch(BowerEvents::POST_INSTALL, new BowerEvent($config));
 
         return $result->getProcess()->getExitCode();
     }
@@ -107,7 +112,7 @@ class Bower
             throw new InvalidMappingException('Bower returned an invalid dependency mapping. This mostly happens when the dependencies are not yet installed or if you are using an old version of bower.');
         }
 
-        $cacheKey = $this->createCacheKey($result->getConfig());
+        $cacheKey = $this->createCacheKey($config);
         $config->getCache()->save($cacheKey, $mapping);
 
         return $this;
@@ -125,18 +130,12 @@ class Bower
     {
         $cacheKey = $this->createCacheKey($config);
 
-        $event = new BowerEvent($config, array());
-        $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
-        $config = $event->getConfiguration();
-
         $dependencyCache = $config->getCache();
         if (!$dependencyCache->contains($cacheKey)) {
             throw new RuntimeException(sprintf(
                 'Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()
             ));
         }
-
-        $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, array()));
 
         $mapping = $dependencyCache->fetch($cacheKey);
 
@@ -202,7 +201,7 @@ class Bower
             $commands = array($commands);
         }
 
-        $event = new BowerEvent($config, $commands);
+        $event = new BowerCommandEvent($config, $commands);
         $this->eventDispatcher->dispatch(BowerEvents::PRE_EXEC, $event);
         $config = $event->getConfiguration();
 
@@ -230,7 +229,7 @@ class Bower
             throw new CommandException($proc->getCommandLine(),trim($proc->getErrorOutput()));
         }
 
-        $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerEvent($config, $commands));
+        $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerCommandEvent($config, $commands));
 
         return new BowerResult($proc, $config);
     }

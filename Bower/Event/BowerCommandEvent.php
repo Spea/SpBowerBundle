@@ -9,20 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Sp\BowerBundle\Bower;
+namespace Sp\BowerBundle\Bower\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Sp\BowerBundle\Bower\ConfigurationInterface;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
  */
-class BowerEvent extends Event
+class BowerCommandEvent extends BowerEvent
 {
-    /**
-     * @var ConfigurationInterface
-     */
-    protected $configuration;
-
     /**
      * @var array
      */
@@ -34,24 +29,8 @@ class BowerEvent extends Event
      */
     public function __construct(ConfigurationInterface $configuration, array $commands)
     {
-        $this->configuration = $configuration;
+        parent::__construct($configuration);
         $this->commands = $commands;
-    }
-
-    /**
-     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $configuration
-     */
-    public function setConfiguration($configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
-    /**
-     * @return \Sp\BowerBundle\Bower\ConfigurationInterface
-     */
-    public function getConfiguration()
-    {
-        return $this->configuration;
     }
 
     /**

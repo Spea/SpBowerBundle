@@ -12,8 +12,9 @@
 namespace Sp\BowerBundle\EventListener;
 
 use Sp\BowerBundle\Bower\Bower;
-use Sp\BowerBundle\Bower\BowerEvent;
-use Sp\BowerBundle\Bower\BowerEvents;
+use Sp\BowerBundle\Bower\Event\BowerCommandEvent;
+use Sp\BowerBundle\Bower\Event\BowerEvent;
+use Sp\BowerBundle\Bower\Event\BowerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -35,16 +36,11 @@ class CacheCreateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param \Sp\BowerBundle\Bower\BowerEvent $event
+     * @param \Sp\BowerBundle\Bower\Event\BowerEvent $event
      */
-    public function onPostExec(BowerEvent $event)
+    public function onPostInstall(BowerEvent $event)
     {
-        if (!in_array('install', $event->getCommands())) {
-            return;
-        }
-
-        $config = $event->getConfiguration();
-        $this->bower->createDependencyMappingCache($config);
+        $this->bower->createDependencyMappingCache($event->getConfiguration());
     }
 
     /**
@@ -53,7 +49,7 @@ class CacheCreateListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            BowerEvents::POST_EXEC => array('onPostExec', 0),
+            BowerEvents::POST_INSTALL => array('onPostInstall', 0),
         );
     }
 

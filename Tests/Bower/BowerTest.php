@@ -12,10 +12,10 @@
 namespace Sp\BowerBundle\Tests\Bower;
 
 use Sp\BowerBundle\Bower\Bower;
-use Sp\BowerBundle\Bower\BowerEvents;
 use Sp\BowerBundle\Bower\Configuration;
-use Symfony\Component\Filesystem\Filesystem;
+use Sp\BowerBundle\Bower\Event\BowerEvents;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -117,8 +117,10 @@ class BowerTest extends AbstractBowerTest
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('install'));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
-        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
-        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_INSTALL));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
+        $this->eventDispatcher->expects($this->at(2))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
+        $this->eventDispatcher->expects($this->at(3))->method('dispatch')->with($this->equalTo(BowerEvents::POST_INSTALL));
 
         $this->bower->expects($this->once())->method('dumpBowerConfig');
 

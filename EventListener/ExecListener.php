@@ -11,8 +11,8 @@
 
 namespace Sp\BowerBundle\EventListener;
 
-use Sp\BowerBundle\Bower\BowerEvent;
-use Sp\BowerBundle\Bower\BowerEvents;
+use Sp\BowerBundle\Bower\Event\BowerCommandEvent;
+use Sp\BowerBundle\Bower\Event\BowerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -35,9 +35,9 @@ class ExecListener implements EventSubscriberInterface
     }
 
     /**
-     * @param \Sp\BowerBundle\Bower\BowerEvent $event
+     * @param \Sp\BowerBundle\Bower\Event\BowerCommandEvent $event
      */
-    public function onPreExec(BowerEvent $event)
+    public function onPreExec(BowerCommandEvent $event)
     {
         if ($event->getConfiguration()->getDirectory() == $this->cacheDir) {
             return;

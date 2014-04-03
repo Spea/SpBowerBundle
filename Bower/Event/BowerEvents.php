@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sp\BowerBundle\Bower;
+namespace Sp\BowerBundle\Bower\Event;
 
 /**
  * @author Martin Parsiegla <martin.parsiegla@gmail.com>
@@ -19,4 +19,8 @@ final class BowerEvents
     const PRE_EXEC = 'bower.pre_exec';
 
     const POST_EXEC = 'bower.post_exec';
+
+    const PRE_INSTALL = 'bower.pre_install';
+
+    const POST_INSTALL = 'bower.post_install';
 }
