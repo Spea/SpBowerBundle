@@ -3,7 +3,10 @@ Changelog
 
 ### 0.10-dev
 
-...
+* Add php 5.6 and hhvm-nightly for testing
+* Remove composer.lock and add it to .gitignore
+* Refactor event dispatching to fix a bug while clearing cache
+* Reset working directory when resolving path for a dependency
 
 ### 0.9 (2014-01-15)
 
