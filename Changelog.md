@@ -1,6 +1,10 @@
 Changelog
 =========
 
+### 0.11-dev
+
+...
+
 ### 0.10 (2014-05-15)
 
 * Add php 5.6 and hhvm-nightly for testing
