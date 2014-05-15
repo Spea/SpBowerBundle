@@ -1,7 +1,7 @@
 Changelog
 =========
 
-### 0.10-dev
+### 0.10 (2014-05-15)
 
 * Add php 5.6 and hhvm-nightly for testing
 * Remove composer.lock and add it to .gitignore
