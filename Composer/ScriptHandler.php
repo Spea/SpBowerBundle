@@ -28,15 +28,22 @@ class ScriptHandler
     public static function bowerInstall(Event $event)
     {
         $options = self::getOptions($event);
-        $appDir = $options['symfony-app-dir'];
 
-        if (!is_dir($appDir)) {
-            echo 'The symfony-app-dir ('.$appDir.') specified in composer.json was not found in '.getcwd().', can not install Bower dependencies.'.PHP_EOL;
+        $binDir = $options['symfony-app-dir'];
+        $configKey = 'symfony-app-dir';
+
+        if (isset($options['symfony-bin-dir'])) {
+            $binDir = $options['symfony-bin-dir'];
+            $configKey = 'symfony-bin-dir';
+        }
+
+        if (!is_dir($binDir)) {
+            echo 'The '.$configKey.' ('.$binDir.') specified in composer.json was not found in '.getcwd().', can not install Bower dependencies.'.PHP_EOL;
 
             return;
         }
 
-        static::executeCommand($event, $appDir, 'sp:bower:install', $options['process-timeout']);
+        static::executeCommand($event, $binDir, 'sp:bower:install', $options['process-timeout']);
     }
 
     /**
