@@ -92,6 +92,25 @@ class Bower
 
         return $result->getProcess()->getExitCode();
     }
+    
+    /**
+     * Updates bower dependencies from the given config directory.
+     *
+     * @param ConfigurationInterface $config
+     * @param null                   $callback
+     *
+     * @return int
+     */
+    public function update(ConfigurationInterface $config, $callback = null)
+    {
+        $this->eventDispatcher->dispatch(BowerEvents::PRE_UPDATE, new BowerEvent($config));
+
+        $result = $this->execCommand($config, array('update'), $callback);
+
+        $this->eventDispatcher->dispatch(BowerEvents::POST_UPDATE, new BowerEvent($config));
+
+        return $result->getProcess()->getExitCode();
+    }
 
     /**
      * Creates the cache for the dependency mapping.
