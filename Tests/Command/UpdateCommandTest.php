@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
- * @author Martin Parsiegla <martin.parsiegla@gmail.com>
+ * @author Jorge Agustín Marisi <agustinmarisi@gmail.com>
  */
 class UpdateCommandTest extends \PHPUnit_Framework_TestCase
 {
