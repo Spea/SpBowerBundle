@@ -128,6 +128,31 @@ class BowerTest extends AbstractBowerTest
 
         $this->bower->install($config);
     }
+    
+    /**
+     * @covers Sp\BowerBundle\Bower\Bower::update
+     * @dataProvider componentsProvider
+     */
+    public function testUpdate($configDir)
+    {
+        $config = new Configuration($configDir);
+        $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('setTimeout')->with($this->equalTo(600));
+        $this->processBuilder->expects($this->at(2))->method('add')->with($this->equalTo($this->bin));
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('update'));
+        $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_UPDATE));
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($this->equalTo(BowerEvents::PRE_EXEC));
+        $this->eventDispatcher->expects($this->at(2))->method('dispatch')->with($this->equalTo(BowerEvents::POST_EXEC));
+        $this->eventDispatcher->expects($this->at(3))->method('dispatch')->with($this->equalTo(BowerEvents::POST_UPDATE));
+
+        $this->bower->expects($this->once())->method('dumpBowerConfig');
+
+        $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
+
+        $this->bower->update($config);
+    }
 
     /**
      * @covers Sp\BowerBundle\Bower\Bower::createDependencyMappingCache

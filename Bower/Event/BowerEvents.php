@@ -23,4 +23,8 @@ final class BowerEvents
     const PRE_INSTALL = 'bower.pre_install';
 
     const POST_INSTALL = 'bower.post_install';
+    
+    const PRE_UPDATE = 'bower.pre_update';
+
+    const POST_UPDATE = 'bower.post_update';
 }
