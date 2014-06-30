@@ -138,8 +138,10 @@ class Configuration implements ConfigurationInterface
         $assetDirectory = $this->getAssetDirectory();
         if (null !== $assetDirectory) {
             $filesystem = new Filesystem();
-            $assetDirectory = $filesystem->makePathRelative($this->getAssetDirectory(), $this->getDirectory());
+            $directory = realpath($this->getDirectory());
+            $assetDirectory = $filesystem->makePathRelative($this->getAssetDirectory(), $directory);
         }
+
         $configuration = array(
             'directory' => $assetDirectory,
             'json' => $this->getJsonFile(),
