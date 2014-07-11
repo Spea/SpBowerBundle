@@ -31,7 +31,7 @@ sp_bower:
         DemoBundle:
             config_dir: Resources/config/bower # Can be relative to the bundles root directory, absolute or a bundle notation
             asset_dir: ../../public/components # Can be relative to the config_dir directory, absolute or a bundle notation
-            json_file: component.json
+            json_file: bower.json
             endpoint: https://bower.herokuapp.com
             # The cache to use for storing the dependencies (optional)
             cache:
