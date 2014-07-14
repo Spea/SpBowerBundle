@@ -3,7 +3,11 @@ Changelog
 
 ### 0.11-dev
 
-...
+* Use PSR4 autoloader (thanks to @jrobeson)
+* Update configuration reference (thanks to @stephanvierkant and @jrobeson)
+* Add command to update bower dependencies (thanks to @amarisi)
+* Make the bundle compatible to new symfony3 directory structure
+* Update Scripthandler to support symfony3 (thanks to @sstok)
 
 ### 0.10 (2014-05-15)
 
