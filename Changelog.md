@@ -1,7 +1,7 @@
 Changelog
 =========
 
-### 0.11-dev
+### 0.11 (2014-07-14)
 
 * Use PSR4 autoloader (thanks to @jrobeson)
 * Update configuration reference (thanks to @stephanvierkant and @jrobeson)
