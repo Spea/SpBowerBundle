@@ -48,6 +48,30 @@ class ScriptHandler
 
     /**
      * @param \Composer\Script\Event $event
+     */
+    public static function bowerUpdate(Event $event)
+    {
+        $options = self::getOptions($event);
+
+        $binDir = $options['symfony-app-dir'];
+        $configKey = 'symfony-app-dir';
+
+        if (isset($options['symfony-bin-dir'])) {
+            $binDir = $options['symfony-bin-dir'];
+            $configKey = 'symfony-bin-dir';
+        }
+
+        if (!is_dir($binDir)) {
+            echo 'The '.$configKey.' ('.$binDir.') specified in composer.json was not found in '.getcwd().', can not install Bower dependencies.'.PHP_EOL;
+
+            return;
+        }
+
+        static::executeCommand($event, $binDir, 'sp:bower:update', $options['process-timeout']);
+    }
+
+    /**
+     * @param \Composer\Script\Event $event
      * @param string                 $appDir
      * @param string                 $cmd
      * @param int                    $timeout
