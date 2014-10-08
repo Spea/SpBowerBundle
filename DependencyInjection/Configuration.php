@@ -37,7 +37,7 @@ class Configuration implements ConfigurationInterface
                 })->end()
                 ->booleanNode('offline')->defaultValue(false)->end()
                 ->booleanNode('allow_root')->defaultFalse()->end()
-                ->booleanNode('timeout')->defaultValue(600)->end()
+                ->integerNode('timeout')->defaultValue(600)->end()
                 ->scalarNode('cache_dir')->cannotBeEmpty()->defaultValue('%kernel.cache_dir%/sp_bower')->end()
                 ->booleanNode('install_on_warmup')->defaultFalse()->end()
                 ->booleanNode('keep_bowerrc')->defaultFalse()->end()
