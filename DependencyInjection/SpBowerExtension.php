@@ -28,7 +28,6 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class SpBowerExtension extends Extension
 {
-
     /**
      * @var \Symfony\Component\Filesystem\Filesystem
      */
@@ -37,7 +36,6 @@ class SpBowerExtension extends Extension
     public function __construct()
     {
         $this->filesystem = new Filesystem();
-
     }
 
     /**
@@ -49,25 +47,21 @@ class SpBowerExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
-        if ($config[ 'assetic' ][ 'enabled' ])
-        {
+        if ($config[ 'assetic' ][ 'enabled' ]) {
             $this->registerAsseticConfiguration($config, $container, $loader);
         }
 
         $cacheDir = $container->getParameterBag()->resolveValue($config[ 'cache_dir' ]);
-        if (!is_dir($cacheDir))
-        {
-            if (false === @mkdir($cacheDir, 0777, true))
-            {
+        if (!is_dir($cacheDir)) {
+            if (false === @mkdir($cacheDir, 0777, true)) {
                 throw new RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
             }
         }
 
         $container->setParameter('sp_bower.cache_dir', $cacheDir);
-        if (!$config[ 'keep_bowerrc' ])
-        {
+        if (!$config[ 'keep_bowerrc' ]) {
             $execListener = $container->getDefinition('sp_bower.exec_listener');
             $execListener->addTag('kernel.event_subscriber');
         }
@@ -78,7 +72,6 @@ class SpBowerExtension extends Extension
         $container->setParameter('sp_bower.bower.bin', $config[ 'bin' ]);
         $container->setParameter('sp_bower.install_on_warmup', $config[ 'install_on_warmup' ]);
         $this->loadBundlesInformation($config[ 'bundles' ], $container);
-
     }
 
     /**
@@ -91,8 +84,7 @@ class SpBowerExtension extends Extension
     protected function registerAsseticConfiguration(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader)
     {
         $bundles = $container->getParameter('kernel.bundles');
-        if (!isset($bundles[ 'AsseticBundle' ]))
-        {
+        if (!isset($bundles[ 'AsseticBundle' ])) {
             throw new RuntimeException('The SpBowerBundle requires the AsseticBundle, please make sure to enable it in your AppKernel.');
         }
 
@@ -106,7 +98,6 @@ class SpBowerExtension extends Extension
 
         $this->processPackageFilters($container, $config[ 'assetic' ][ 'filters' ][ 'packages' ]);
         $this->processPackageNestDependencies($container, $config[ 'assetic' ][ 'nest_dependencies' ]);
-
     }
 
     /**
@@ -115,12 +106,10 @@ class SpBowerExtension extends Extension
      */
     protected function processPackageNestDependencies(ContainerBuilder $container, array $nestDependencies)
     {
-        foreach ($nestDependencies as $packageName => $enabled)
-        {
+        foreach ($nestDependencies as $packageName => $enabled) {
             $definition = $this->createPackageResource($container, $packageName);
             $definition->addMethodCall('setNestDependencies', array( $enabled ));
         }
-
     }
 
     /**
@@ -129,13 +118,11 @@ class SpBowerExtension extends Extension
      */
     protected function processPackageFilters(ContainerBuilder $container, array $packageFilters)
     {
-        foreach ($packageFilters as $packageName => $filters)
-        {
+        foreach ($packageFilters as $packageName => $filters) {
             $definition = $this->createPackageResource($container, $packageName);
             $definition->addMethodCall('setCssFilters', array( $filters[ 'css' ] ));
             $definition->addMethodCall('setJsFilters', array( $filters[ 'js' ] ));
         }
-
     }
 
     /**
@@ -147,8 +134,7 @@ class SpBowerExtension extends Extension
     protected function createPackageResource(ContainerBuilder $container, $packageName)
     {
         $packageResourceId = sprintf("sp_bower.assetic.%s_package_resource", $packageName);
-        if ($container->hasDefinition($packageResourceId))
-        {
+        if ($container->hasDefinition($packageResourceId)) {
             return $container->getDefinition($packageResourceId);
         }
 
@@ -159,33 +145,28 @@ class SpBowerExtension extends Extension
         $resourceDefinition->addMethodCall('addPackageResource', array( new Reference($packageResourceId) ));
 
         return $definition;
-
     }
 
     protected function loadBundlesInformation($bundles, ContainerBuilder $container)
     {
         $bowerManager = $container->getDefinition('sp_bower.bower_manager');
 
-        foreach ($bundles as $bundleName => $bundleConfig)
-        {
+        foreach ($bundles as $bundleName => $bundleConfig) {
             $bundle = $this->getBundleReflectionClass($container, $bundleName);
-            if (null === $bundle)
-            {
+            if (null === $bundle) {
                 throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $bundleName));
             }
 
             $bundleDir = dirname($bundle->getFilename());
 
             $bundleConfig[ 'config_dir' ] = $this->parseDirectory($container, $bundleConfig[ 'config_dir' ]);
-            if (!$this->filesystem->isAbsolutePath($bundleConfig[ 'config_dir' ]))
-            {
-                $bundleConfig[ 'config_dir' ] = $bundleDir . DIRECTORY_SEPARATOR . $bundleConfig[ 'config_dir' ];
+            if (!$this->filesystem->isAbsolutePath($bundleConfig[ 'config_dir' ])) {
+                $bundleConfig[ 'config_dir' ] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig[ 'config_dir' ];
             }
 
             $bundleConfig[ 'asset_dir' ] = $this->parseDirectory($container, $bundleConfig[ 'asset_dir' ]);
-            if (!$this->filesystem->isAbsolutePath($bundleConfig[ 'asset_dir' ]))
-            {
-                $bundleConfig[ 'asset_dir' ] = $bundleConfig[ 'config_dir' ] . DIRECTORY_SEPARATOR . $bundleConfig[ 'asset_dir' ];
+            if (!$this->filesystem->isAbsolutePath($bundleConfig[ 'asset_dir' ])) {
+                $bundleConfig[ 'asset_dir' ] = $bundleConfig[ 'config_dir' ].DIRECTORY_SEPARATOR.$bundleConfig[ 'asset_dir' ];
             }
 
             $cacheReference = $this->createCache($container, $bundleName, $bundleConfig[ 'cache' ], $bundleConfig[ 'config_dir' ]);
@@ -198,7 +179,6 @@ class SpBowerExtension extends Extension
             $configuration->addMethodCall('setCache', array( $cacheReference ));
             $bowerManager->addMethodCall('addBundle', array( $bundleName, $configuration ));
         }
-
     }
 
     /**
@@ -209,16 +189,13 @@ class SpBowerExtension extends Extension
      */
     private function getBundleReflectionClass(ContainerBuilder $container, $bundleName)
     {
-        foreach ($container->getParameter('kernel.bundles') as $name => $class)
-        {
-            if ($bundleName === $name)
-            {
+        foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+            if ($bundleName === $name) {
                 return new \ReflectionClass($class);
             }
         }
 
         return null;
-
     }
 
     /**
@@ -232,21 +209,18 @@ class SpBowerExtension extends Extension
     private function parseDirectory(ContainerBuilder $container, $directory)
     {
         // expand bundle notation
-        if ('@' == $directory[ 0 ] && false !== strpos($directory, '/'))
-        {
+        if ('@' == $directory[ 0 ] && false !== strpos($directory, '/')) {
             // use the bundle path as this asset's root
             $bundleName = substr($directory, 1);
-            if (false !== $pos = strpos($bundleName, '/'))
-            {
+            if (false !== $pos = strpos($bundleName, '/')) {
                 $bundleName = substr($bundleName, 0, $pos);
             }
 
             $bundlePath = dirname($this->getBundleReflectionClass($container, $bundleName)->getFileName());
-            $directory = str_replace('@' . $bundleName, $bundlePath, $directory);
+            $directory = str_replace('@'.$bundleName, $bundlePath, $directory);
         }
 
         return $directory;
-
     }
 
     /**
@@ -258,10 +232,8 @@ class SpBowerExtension extends Extension
     protected function createCache(ContainerBuilder $container, $bundleName, array $cacheConfig, $baseDir)
     {
         $cacheServiceId = $cacheConfig[ 'id' ];
-        if (null !== $cacheServiceId)
-        {
-            if (!$container->hasDefinition($cacheServiceId))
-            {
+        if (null !== $cacheServiceId) {
+            if (!$container->hasDefinition($cacheServiceId)) {
                 throw new RuntimeEXception(sprintf('Cache service with id [%s] not found', $cacheServiceId));
             }
 
@@ -269,18 +241,15 @@ class SpBowerExtension extends Extension
         }
 
         $cacheDir = $this->parseDirectory($container, $cacheConfig[ 'directory' ]);
-        if (!$this->filesystem->isAbsolutePath($cacheDir))
-        {
-            $cacheDir = $baseDir . DIRECTORY_SEPARATOR . $cacheDir;
+        if (!$this->filesystem->isAbsolutePath($cacheDir)) {
+            $cacheDir = $baseDir.DIRECTORY_SEPARATOR.$cacheDir;
         }
 
         $def = new DefinitionDecorator('sp_bower.filesystem_cache');
         $def->replaceArgument(0, $cacheDir);
 
-        $container->setDefinition(($defId = 'sp_bower.filesystem_cache.' . $bundleName), $def);
+        $container->setDefinition(($defId = 'sp_bower.filesystem_cache.'.$bundleName), $def);
 
         return new Reference($defId);
-
     }
-
 }

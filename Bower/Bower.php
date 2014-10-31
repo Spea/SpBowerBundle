@@ -26,7 +26,6 @@ use Symfony\Component\Process\ProcessBuilder;
  */
 class Bower
 {
-
     /**
      * @var string
      */
@@ -74,11 +73,10 @@ class Bower
     {
         $this->bowerPath = $bowerPath;
         $this->eventDispatcher = $eventDispatcher;
-        $this->dependencyMapper = $dependencyMapper ? : new DependencyMapper();
+        $this->dependencyMapper = $dependencyMapper ?: new DependencyMapper();
         $this->offline = $offline;
         $this->allowRoot = $allowRoot;
         $this->timeOut = $timeOut;
-
     }
 
     /**
@@ -98,7 +96,6 @@ class Bower
         $this->eventDispatcher->dispatch(BowerEvents::POST_INSTALL, new BowerEvent($config));
 
         return $result->getProcess()->getExitCode();
-
     }
 
     /**
@@ -118,7 +115,6 @@ class Bower
         $this->eventDispatcher->dispatch(BowerEvents::POST_UPDATE, new BowerEvent($config));
 
         return $result->getProcess()->getExitCode();
-
     }
 
     /**
@@ -136,8 +132,7 @@ class Bower
         $output = $result->getProcess()->getOutput();
 
         $mapping = json_decode($output, true);
-        if (null === $mapping)
-        {
+        if (null === $mapping) {
             throw new InvalidMappingException('Bower returned an invalid dependency mapping. This mostly happens when the dependencies are not yet installed or if you are using an old version of bower.');
         }
 
@@ -145,7 +140,6 @@ class Bower
         $config->getCache()->save($cacheKey, $mapping);
 
         return $this;
-
     }
 
     /**
@@ -161,8 +155,7 @@ class Bower
         $cacheKey = $this->createCacheKey($config);
 
         $dependencyCache = $config->getCache();
-        if (!$dependencyCache->contains($cacheKey))
-        {
+        if (!$dependencyCache->contains($cacheKey)) {
             throw new RuntimeException(sprintf(
                     'Cached dependencies for "%s" not found, create it with the method createDependencyMappingCache().', $config->getDirectory()
             ));
@@ -171,7 +164,6 @@ class Bower
         $mapping = $dependencyCache->fetch($cacheKey);
 
         return $this->dependencyMapper->map($mapping, $config);
-
     }
 
     /**
@@ -179,13 +171,11 @@ class Bower
      */
     public function getProcessBuilder()
     {
-        if (null === $this->processBuilder)
-        {
+        if (null === $this->processBuilder) {
             return new ProcessBuilder();
         }
 
         return $this->processBuilder;
-
     }
 
     /**
@@ -194,7 +184,6 @@ class Bower
     public function setProcessBuilder(ProcessBuilder $processBuilder)
     {
         $this->processBuilder = $processBuilder;
-
     }
 
     /**
@@ -204,12 +193,10 @@ class Bower
      */
     protected function dumpBowerConfig(ConfigurationInterface $configuration)
     {
-        $configFile = $configuration->getDirectory() . DIRECTORY_SEPARATOR . '.bowerrc';
-        if (!file_exists($configFile) || file_get_contents($configFile) != $configuration->getJson())
-        {
+        $configFile = $configuration->getDirectory().DIRECTORY_SEPARATOR.'.bowerrc';
+        if (!file_exists($configFile) || file_get_contents($configFile) != $configuration->getJson()) {
             file_put_contents($configFile, $configuration->getJson());
         }
-
     }
 
     /**
@@ -222,7 +209,6 @@ class Bower
     private function createCacheKey(ConfigurationInterface $config)
     {
         return hash("sha1", $config->getDirectory());
-
     }
 
     /**
@@ -235,8 +221,7 @@ class Bower
      */
     private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
     {
-        if (is_string($commands))
-        {
+        if (is_string($commands)) {
             $commands = array( $commands );
         }
 
@@ -250,32 +235,26 @@ class Bower
         $pb->setWorkingDirectory($config->getDirectory());
         $pb->setTimeout($this->timeOut);
         $pb->add($this->bowerPath);
-        if ($this->offline)
-        {
+        if ($this->offline) {
             $pb->add('--offline');
         }
-        if ($this->allowRoot)
-        {
+        if ($this->allowRoot) {
             $pb->add('--allow-root');
         }
 
-        foreach ($commands as $command)
-        {
+        foreach ($commands as $command) {
             $pb->add($command);
         }
 
         $proc = $pb->getProcess();
         $proc->run($callback);
 
-        if (!$proc->isSuccessful())
-        {
+        if (!$proc->isSuccessful()) {
             throw new CommandException($proc->getCommandLine(), trim($proc->getErrorOutput()));
         }
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerCommandEvent($config, $commands));
 
         return new BowerResult($proc, $config);
-
     }
-
 }

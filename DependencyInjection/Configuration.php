@@ -20,7 +20,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-
     /**
      * {@inheritDoc}
      */
@@ -32,7 +31,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('sp_bower');
         $rootNode
                 ->children()
-                ->scalarNode('bin')->defaultValue(function() use ($finder) {
+                ->scalarNode('bin')->defaultValue(function () use ($finder) {
                     return $finder->find('bower', '/usr/bin/bower');
                 })->end()
                 ->booleanNode('offline')->defaultValue(false)->end()
@@ -96,7 +95,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                 ->beforeNormalization()
                 ->ifString()
-                ->then(function($v) {
+                ->then(function ($v) {
                     return array( 'config_dir' => $v );
                 })
                 ->end()
@@ -105,7 +104,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('cache')
                 ->beforeNormalization()
                 ->ifString()
-                ->then(function($v) {
+                ->then(function ($v) {
                     return array( 'directory' => $v );
                 })
                 ->end()
@@ -124,7 +123,5 @@ class Configuration implements ConfigurationInterface
                 ->end();
 
         return $treeBuilder;
-
     }
-
 }
