@@ -92,7 +92,7 @@ class Bower
 
         return $result->getProcess()->getExitCode();
     }
-    
+
     /**
      * Updates bower dependencies from the given config directory.
      *
@@ -245,7 +245,7 @@ class Bower
         $proc->run($callback);
 
         if (!$proc->isSuccessful()) {
-            throw new CommandException($proc->getCommandLine(),trim($proc->getErrorOutput()));
+            throw new CommandException($proc->getCommandLine(), trim($proc->getErrorOutput()));
         }
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_EXEC, new BowerCommandEvent($config, $commands));

@@ -19,7 +19,7 @@ interface PackageNamingStrategyInterface
     /**
      * Translates a given package name to its assetic name.
      *
-     * @param $packageName
+     * @param string $packageName
      *
      * @return string
      */

@@ -97,7 +97,7 @@ class SpBowerExtension extends Extension
         unset($config['assetic']['nest_dependencies']['all']);
 
         $this->processPackageFilters($container, $config['assetic']['filters']['packages']);
-        $this->processPackageNestDependencies($container    , $config['assetic']['nest_dependencies']);
+        $this->processPackageNestDependencies($container, $config['assetic']['nest_dependencies']);
     }
 
     /**
@@ -227,7 +227,9 @@ class SpBowerExtension extends Extension
      * @param ContainerBuilder $container
      * @param string           $bundleName
      * @param array            $cacheConfig
-     * @param string           $bundleDir
+     * @param string           $baseDir
+     *
+     * @return Reference
      */
     protected function createCache(ContainerBuilder $container, $bundleName, array $cacheConfig, $baseDir)
     {

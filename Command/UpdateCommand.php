@@ -33,7 +33,8 @@ The <info>sp:bower:update</info> command updates bower dependencies for every bu
 
   <info>php app/console sp:bower:update</info>
 EOT
-        );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
