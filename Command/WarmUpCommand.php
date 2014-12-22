@@ -30,7 +30,8 @@ The <info>sp:bower:warmup</info> command warmup bower mapping dependencies for e
 
   <info>php app/console sp:bower:warmup</info>
 EOT
-        );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

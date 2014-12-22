@@ -30,7 +30,8 @@ The <info>sp:bower:list</info> command lists all packages and their resources.
 
   <info>php app/console sp:bower:list</info>
 EOT
-        );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

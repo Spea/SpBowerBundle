@@ -33,7 +33,8 @@ The <info>sp:bower:install</info> command installs bower dependencies for every 
 
   <info>php app/console sp:bower:install</info>
 EOT
-        );
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
