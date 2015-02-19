@@ -80,13 +80,14 @@ class ScriptHandler
      */
     protected static function executeCommand(Event $event, $appDir, $cmd, $timeout = 300)
     {
-        $php = escapeshellarg(self::getPhp());
+        $php = escapeshellarg(self::getPhp(false));
+        $phpArgs = implode(' ', array_map('escapeshellarg', self::getPhpArguments()));
         $console = escapeshellarg($appDir.'/console');
         if ($event->getIO()->isDecorated()) {
             $console.= ' --ansi';
         }
 
-        $process = new Process($php.' '.$console.' '.$cmd, null, null, null, $timeout);
+        $process = new Process($php.($phpArgs ? ' '.$phpArgs : '').' '.$console.' '.$cmd, null, null, null, $timeout);
         $process->run(function ($type, $buffer) { echo $buffer; });
         if (!$process->isSuccessful()) {
             throw new \RuntimeException(sprintf('An error occurred when executing the "%s" command.', escapeshellarg($cmd)));
@@ -113,13 +114,20 @@ class ScriptHandler
      * @return string|false
      * @throws \RuntimeException
      */
-    protected static function getPhp()
+    protected static function getPhp($includeArgs = true)
     {
-        $phpFinder = new PhpExecutableFinder;
-        if (!$phpPath = $phpFinder->find()) {
+        $phpFinder = new PhpExecutableFinder();
+        if (!$phpPath = $phpFinder->find($includeArgs)) {
             throw new \RuntimeException('The php executable could not be found, add it to your PATH environment variable and try again');
         }
 
         return $phpPath;
     }
+
+   protected static function getPhpArguments()
+   {
+       $phpFinder = new PhpExecutableFinder();
+
+       return method_exists($phpFinder, 'findArguments') ? $phpFinder->findArguments() : array();
+   }
 }
