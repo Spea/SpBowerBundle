@@ -235,10 +235,6 @@ class SpBowerExtension extends Extension
     {
         $cacheServiceId = $cacheConfig['id'];
         if (null !== $cacheServiceId) {
-            if (!$container->hasDefinition($cacheServiceId)) {
-                throw new RuntimeEXception(sprintf('Cache service with id [%s] not found', $cacheServiceId));
-            }
-
             return new Reference($cacheServiceId);
         }
 
