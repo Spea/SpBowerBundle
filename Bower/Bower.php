@@ -203,7 +203,9 @@ class Bower
      */
     private function createCacheKey(ConfigurationInterface $config)
     {
-        return hash("sha1", $config->getDirectory());
+        $file = $config->getDirectory() . DIRECTORY_SEPARATOR . $config->getJsonFile();
+
+        return hash_file("sha1", $file);
     }
 
     /**

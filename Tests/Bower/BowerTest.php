@@ -128,7 +128,7 @@ class BowerTest extends AbstractBowerTest
 
         $this->bower->install($config);
     }
-    
+
     /**
      * @covers Sp\BowerBundle\Bower\Bower::update
      * @dataProvider componentsProvider
@@ -159,8 +159,11 @@ class BowerTest extends AbstractBowerTest
      */
     public function testCreateDependencyMappingCache()
     {
-        $configDir = "/config_dir";
+        $configDir = __DIR__ ."/Fixtures/config";
+        $jsonFile = 'bower.json';
+        $jsonFilePath = $configDir . "/". $jsonFile;
         $config = new Configuration($configDir);
+        $config->setJsonFile($jsonFile);
         $config->setCache($this->cache);
 
         $jsonDependencyMapping = file_get_contents(self::$fixturesDirectory .'/dependency_mapping.json');
@@ -180,7 +183,7 @@ class BowerTest extends AbstractBowerTest
         $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
         $this->process->expects($this->once())->method('getOutput')->will($this->returnValue($jsonDependencyMapping));
 
-        $this->cache->expects($this->once())->method('save')->with($this->equalTo(hash('sha1', $configDir)), $this->equalTo($arrayDependencyMapping));
+        $this->cache->expects($this->once())->method('save')->with($this->equalTo(hash_file('sha1', $jsonFilePath)), $this->equalTo($arrayDependencyMapping));
 
         $this->bower->createDependencyMappingCache($config);
     }

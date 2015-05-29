@@ -33,7 +33,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testGetJsonReturnsObject()
     {
         $config = new Configuration('/foo');
-        $config->setDirectory('/tmp');
+        $config->setDirectory('/test');
         $config->setAssetDirectory('/foo');
         $config->setJsonFile('foo.json');
 
