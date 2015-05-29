@@ -3,7 +3,12 @@ Changelog
 
 ### 0.12-dev
 
-...
+* Add bowerUpdate to ScriptHandler (thanks to @chellem)
+* Minor phpcs fixes (thanks to @acrobat)
+* Added support for HHVM in ScriptHandler (thanks to @lavoiesl)
+* Use file has for cache key
+* Update configuration reference
+* Do not check for service id when using a self defined cache
 
 ### 0.11 (2014-07-14)
 
