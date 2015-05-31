@@ -43,7 +43,7 @@ class ScriptHandler
             return;
         }
 
-        static::executeCommand($event, $binDir, 'sp:bower:install', $options['process-timeout']);
+        static::executeCommand($event, $binDir, 'sp:bower:install --interactive=false', $options['process-timeout']);
     }
 
     /**
@@ -67,7 +67,7 @@ class ScriptHandler
             return;
         }
 
-        static::executeCommand($event, $binDir, 'sp:bower:update', $options['process-timeout']);
+        static::executeCommand($event, $binDir, 'sp:bower:update --interactive=false', $options['process-timeout']);
     }
 
     /**
@@ -84,7 +84,7 @@ class ScriptHandler
         $phpArgs = implode(' ', array_map('escapeshellarg', self::getPhpArguments()));
         $console = escapeshellarg($appDir.'/console');
         if ($event->getIO()->isDecorated()) {
-            $console.= ' --ansi';
+            $console .= ' --ansi';
         }
 
         $process = new Process($php.($phpArgs ? ' '.$phpArgs : '').' '.$console.' '.$cmd, null, null, null, $timeout);

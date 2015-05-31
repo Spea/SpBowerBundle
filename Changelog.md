@@ -9,6 +9,7 @@ Changelog
 * Use file has for cache key
 * Update configuration reference
 * Do not check for service id when using a self defined cache
+* Possible dependency conflicts can now be resolved when running sp:bower:install or sp:bower:update
 
 ### 0.11 (2014-07-14)
 

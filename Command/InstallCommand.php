@@ -14,6 +14,7 @@ namespace Sp\BowerBundle\Command;
 use Sp\BowerBundle\Bower\Exception\CommandException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Process\Process;
@@ -27,6 +28,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sp:bower:install')
+            ->addOption('interactive', 'i', InputOption::VALUE_OPTIONAL, 'Whether or not to use interactive mode, useful to resolve conflicts', true)
             ->setDescription('Install all bower dependencies.')
             ->setHelp(<<<EOT
 The <info>sp:bower:install</info> command installs bower dependencies for every bundle:
@@ -50,7 +52,7 @@ EOT
         foreach ($bowerManager->getBundles() as $bundle => $configuration) {
             $output->writeln(sprintf('Installing bower dependencies for <comment>"%s"</comment> into <comment>"%s"</comment>', $bundle, $configuration->getAssetDirectory()));
             try {
-                $bower->install($configuration, $callback);
+                $bower->install($configuration, $callback, $input->getOption('interactive'));
             } catch (CommandException $ex) {
                 $output->writeln($ex->getCommandError());
                 throw new RuntimeException("An error occured while installing dependencies");

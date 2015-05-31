@@ -4,6 +4,13 @@ Upgrade instruction
 This document describes the changes needed when upgrading because of a BC
 break. For the full list of changes, please look at the Changelog file.
 
+## 0.11 to 0.12
+
+### Configuration
+
+The default value for the option `keep_bowerrc` has changed from `false` to `true`. Also this option is now deprecated
+and will be removed in Version 0.13.
+
 ## 0.7 to 0.8
 
 ### Configuration

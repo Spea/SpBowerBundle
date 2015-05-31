@@ -11,6 +11,7 @@
 
 namespace Sp\BowerBundle\Bower;
 
+use Closure;
 use Sp\BowerBundle\Bower\Event\BowerCommandEvent;
 use Sp\BowerBundle\Bower\Event\BowerEvent;
 use Sp\BowerBundle\Bower\Event\BowerEvents;
@@ -33,12 +34,12 @@ class Bower
     protected $bowerPath;
 
     /**
-     * @var \Symfony\Component\Process\ProcessBuilder
+     * @var ProcessBuilder
      */
     protected $processBuilder;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -58,11 +59,11 @@ class Bower
     protected $allowRoot;
 
     /**
-     * @param string                                                      $bowerPath
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     * @param Package\DependencyMapperInterface                           $dependencyMapper
-     * @param boolean                                                     $offline
-     * @param boolean                                                     $allowRoot
+     * @param string                            $bowerPath
+     * @param EventDispatcherInterface          $eventDispatcher
+     * @param Package\DependencyMapperInterface $dependencyMapper
+     * @param boolean                           $offline
+     * @param boolean                           $allowRoot
      */
     public function __construct($bowerPath = '/usr/bin/bower', EventDispatcherInterface $eventDispatcher,
                                 DependencyMapperInterface $dependencyMapper = null, $offline = false, $allowRoot = false)
@@ -79,14 +80,15 @@ class Bower
      *
      * @param ConfigurationInterface $config
      * @param null                   $callback
+     * @param bool                   $interactive
      *
      * @return int
      */
-    public function install(ConfigurationInterface $config, $callback = null)
+    public function install(ConfigurationInterface $config, $callback = null, $interactive = false)
     {
         $this->eventDispatcher->dispatch(BowerEvents::PRE_INSTALL, new BowerEvent($config));
 
-        $result = $this->execCommand($config, array('install'), $callback);
+        $result = $this->execCommand($config, array('install'), $callback, $interactive);
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_INSTALL, new BowerEvent($config));
 
@@ -98,14 +100,15 @@ class Bower
      *
      * @param ConfigurationInterface $config
      * @param null                   $callback
+     * @param bool                   $interactive
      *
      * @return int
      */
-    public function update(ConfigurationInterface $config, $callback = null)
+    public function update(ConfigurationInterface $config, $callback = null, $interactive = false)
     {
         $this->eventDispatcher->dispatch(BowerEvents::PRE_UPDATE, new BowerEvent($config));
 
-        $result = $this->execCommand($config, array('update'), $callback);
+        $result = $this->execCommand($config, array('update'), $callback, $interactive);
 
         $this->eventDispatcher->dispatch(BowerEvents::POST_UPDATE, new BowerEvent($config));
 
@@ -115,7 +118,7 @@ class Bower
     /**
      * Creates the cache for the dependency mapping.
      *
-     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
+     * @param ConfigurationInterface $config
      *
      * @throws Exception\MappingException
      * @throws Exception\InvalidMappingException
@@ -140,7 +143,7 @@ class Bower
     /**
      * Get the dependency mapping from the installed packages.
      *
-     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
+     * @param ConfigurationInterface $config
      *
      * @throws Exception\RuntimeException
      * @return mixed
@@ -174,7 +177,7 @@ class Bower
     }
 
     /**
-     * @param \Symfony\Component\Process\ProcessBuilder $processBuilder
+     * @param ProcessBuilder $processBuilder
      */
     public function setProcessBuilder(ProcessBuilder $processBuilder)
     {
@@ -184,7 +187,7 @@ class Bower
     /**
      * Creates a bower configuration file (.bowerrc) in the config directory.
      *
-     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $configuration The configuration for bower
+     * @param ConfigurationInterface $configuration The configuration for bower
      */
     protected function dumpBowerConfig(ConfigurationInterface $configuration)
     {
@@ -209,14 +212,14 @@ class Bower
     }
 
     /**
-     * @param ConfigurationInterface     $config
-     * @param string|array               $commands
-     * @param \Closure|string|array|null $callback
+     * @param ConfigurationInterface    $config
+     * @param string|array              $commands
+     * @param Closure|string|array|null $callback
+     * @param bool                      $tty
      *
-     * @throws Exception\CommandException
      * @return BowerResult
      */
-    private function execCommand(ConfigurationInterface $config, $commands, $callback = null)
+    private function execCommand(ConfigurationInterface $config, $commands, $callback = null, $tty = false)
     {
         if (is_string($commands)) {
             $commands = array($commands);
@@ -244,6 +247,7 @@ class Bower
         }
 
         $proc = $pb->getProcess();
+        $proc->setTty($tty);
         $proc->run($callback);
 
         if (!$proc->isSuccessful()) {
