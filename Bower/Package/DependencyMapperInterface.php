@@ -11,6 +11,7 @@
 
 namespace Sp\BowerBundle\Bower\Package;
 
+use Doctrine\Common\Collections\Collection;
 use Sp\BowerBundle\Bower\ConfigurationInterface;
 
 /**
@@ -19,10 +20,10 @@ use Sp\BowerBundle\Bower\ConfigurationInterface;
 interface DependencyMapperInterface
 {
     /**
-     * @param array                                        $packagesInfo
-     * @param \Sp\BowerBundle\Bower\ConfigurationInterface $config
+     * @param array                  $packagesInfo
+     * @param ConfigurationInterface $config
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection|Package[]
      */
     public function map(array $packagesInfo, ConfigurationInterface $config);
 }

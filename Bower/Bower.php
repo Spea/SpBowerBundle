@@ -12,6 +12,7 @@
 namespace Sp\BowerBundle\Bower;
 
 use Closure;
+use Doctrine\Common\Collections\Collection;
 use Sp\BowerBundle\Bower\Event\BowerCommandEvent;
 use Sp\BowerBundle\Bower\Event\BowerEvent;
 use Sp\BowerBundle\Bower\Event\BowerEvents;
@@ -20,6 +21,7 @@ use Sp\BowerBundle\Bower\Exception\InvalidMappingException;
 use Sp\BowerBundle\Bower\Exception\RuntimeException;
 use Sp\BowerBundle\Bower\Package\DependencyMapper;
 use Sp\BowerBundle\Bower\Package\DependencyMapperInterface;
+use Sp\BowerBundle\Bower\Package\Package;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -146,7 +148,7 @@ class Bower
      * @param ConfigurationInterface $config
      *
      * @throws Exception\RuntimeException
-     * @return mixed
+     * @return Collection|Package[]
      */
     public function getDependencyMapping(ConfigurationInterface $config)
     {

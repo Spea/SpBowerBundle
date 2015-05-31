@@ -28,18 +28,21 @@ use Symfony\Bundle\AsseticBundle\Factory\Resource\ConfigurationResource;
  */
 class BowerResource extends ConfigurationResource implements \Serializable
 {
+    const CSS_EXTENSION = 'css';
+    const JS_EXTENSION = 'js';
+
     /**
-     * @var \Sp\BowerBundle\Bower\Bower
+     * @var Bower
      */
     protected $bower;
 
     /**
-     * @var \Sp\BowerBundle\Bower\BowerManager
+     * @var BowerManager
      */
     protected $bowerManager;
 
     /**
-     * @var \Sp\BowerBundle\Naming\PackageNamingStrategyInterface
+     * @var PackageNamingStrategyInterface
      */
     protected $namingStrategy;
 
@@ -67,16 +70,24 @@ class BowerResource extends ConfigurationResource implements \Serializable
      * @var array
      */
     protected $typeGetters = array(
-        'css' => 'getStyles',
-        'js'  => 'getScripts'
+        self::CSS_EXTENSION => 'getStyles',
+        self::JS_EXTENSION => 'getScripts'
+    );
+
+    /**
+     * @var array
+     */
+    private $extensions = array(
+        self::CSS_EXTENSION,
+        self::JS_EXTENSION
     );
 
     /**
      * Constructor
      *
-     * @param \Sp\BowerBundle\Bower\Bower                           $bower
-     * @param \Sp\BowerBundle\Bower\BowerManager                    $bowerManager
-     * @param \Sp\BowerBundle\Naming\PackageNamingStrategyInterface $namingStrategy
+     * @param Bower                          $bower
+     * @param BowerManager                   $bowerManager
+     * @param PackageNamingStrategyInterface $namingStrategy
      */
     public function __construct(Bower $bower, BowerManager $bowerManager, PackageNamingStrategyInterface $namingStrategy)
     {
@@ -93,7 +104,7 @@ class BowerResource extends ConfigurationResource implements \Serializable
     {
         $formulae = array();
         /** @var $config ConfigurationInterface */
-        foreach ($this->bowerManager->getBundles() as $config) {
+        foreach ($this->bowerManager->getBundles() as $bundle => $config) {
             try {
                 $mapping = $this->bower->getDependencyMapping($config);
             } catch (FileNotFoundException $ex) {
@@ -102,15 +113,21 @@ class BowerResource extends ConfigurationResource implements \Serializable
                 throw new RuntimeException('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
             }
 
-            /** @var $package Package */
+            $extensionFormulae = array();
             foreach ($mapping as $package) {
                 $packageName = $this->namingStrategy->translateName($package->getName());
-
-                $packageFormula = $this->createPackageFormulae($package, $packageName, $config->getDirectory());
-                if (!empty($packageFormula)) {
-                    $formulae = array_merge($packageFormula, $formulae);
+                foreach ($this->extensions as $extension) {
+                    $packageFormulae = $this->createPackageFormulae($package, $packageName, $extension);
+                    if (!empty($packageFormulae)) {
+                        $formulaName = sprintf('%s_%s', $packageName, $extension);
+                        $formulae[$formulaName] = $packageFormulae;
+                        $extensionFormulae[$extension][] = $formulaName;
+                    }
                 }
             }
+
+            $bundleFormulae = $this->createBundleFormulae($bundle, $extensionFormulae);
+            $formulae = array_merge($formulae, $bundleFormulae);
         }
 
         return $formulae;
@@ -205,14 +222,12 @@ class BowerResource extends ConfigurationResource implements \Serializable
      *
      * @param \Sp\BowerBundle\Bower\Package\Package $package
      * @param string                                $packageName
-     * @param string                                $configDir
+     * @param string                                $extension
      *
      * @return array<string,array<array>>
      */
-    protected function createPackageFormulae(Package $package, $packageName, $configDir)
+    protected function createPackageFormulae(Package $package, $packageName, $extension)
     {
-        $formulae = array();
-
         /** @var PackageResource $packageResource */
         $packageResource = $this->packageResources->get($packageName);
 
@@ -221,15 +236,29 @@ class BowerResource extends ConfigurationResource implements \Serializable
             $nestDependencies = $packageResource->shouldNestDependencies();
         }
 
-        if (null !== $cssFiles = $this->createSingleFormula($package, $nestDependencies, 'css')) {
-            $formulae[$packageName . '_css'] = array($cssFiles, $this->resolveCssFilters($packageResource), array());
+        if (null !== $assets = $this->createSingleFormula($package, $nestDependencies, $extension)) {
+            return array($assets, $this->resolveFilters($extension, $packageResource), array());
         }
 
-        if (null !== $jsFiles = $this->createSingleFormula($package, $nestDependencies, 'js')) {
-            $formulae[$packageName . '_js'] = array($jsFiles, $this->resolveJsFilters($packageResource), array());
-        }
+        return array();
+    }
 
-        return $formulae;
+    /**
+     * @param string $extension
+     * @param PackageResource $packageResource
+     *
+     * @return array
+     */
+    protected function resolveFilters($extension, PackageResource $packageResource = null)
+    {
+        switch ($extension) {
+            case self::CSS_EXTENSION:
+                return $this->resolveCssFilters($packageResource);
+                break;
+            case self::JS_EXTENSION:
+                return $this->resolveJsFilters($packageResource);
+                break;
+        }
     }
 
     /**
@@ -308,5 +337,28 @@ class BowerResource extends ConfigurationResource implements \Serializable
         }
 
         return $files;
+    }
+
+    /**
+     * @param string $bundle
+     * @param array  $extensionFormulae
+     *
+     * @return array
+     */
+    private function createBundleFormulae($bundle, array $extensionFormulae)
+    {
+        $formulae = array();
+        foreach ($extensionFormulae as $extension => $extensionFormula) {
+            $assetName = sprintf('%s_%s', $bundle, $extension);
+            $assets = array_map(function ($value) {
+                return '@' . $value;
+            }, $extensionFormula);
+
+            if (!empty($assets)) {
+                $formulae[$assetName] = array($assets, array(), array());
+            }
+        }
+
+        return $formulae;
     }
 }

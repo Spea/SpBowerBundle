@@ -134,4 +134,18 @@ class BowerResourceTest extends AbstractBowerTest
 
         $this->assertContains($cssFilter, $formulae['other_package_css'][1]);
     }
+
+    public function testFormulaeHasBundleAsset()
+    {
+        $formulae = $this->bowerResource->getContent();
+
+        $this->assertArrayHasKey('DemoBundle_js', $formulae);
+        $this->assertArrayHasKey('DemoBundle_css', $formulae);
+        $this->assertContains('@package_js', $formulae['DemoBundle_js'][0]);
+        $this->assertContains('@other_package_js', $formulae['DemoBundle_js'][0]);
+        $this->assertContains('@dependency_package_js', $formulae['DemoBundle_js'][0]);
+
+        $this->assertNotContains('@invalid_package_name_js', $formulae['DemoBundle_js'][0]);
+        $this->assertNotContains('@boo_package_js', $formulae['DemoBundle_js'][0]);
+    }
 }
