@@ -46,35 +46,28 @@ class Bower
     protected $eventDispatcher;
 
     /**
-     * @var \Sp\BowerBundle\Bower\Package\DependencyMapperInterface
+     * @var DependencyMapperInterface
      */
     protected $dependencyMapper;
 
     /**
-     * @var boolean true if bower should operate in offline mode
+     * @var options to add to the bower command
      */
-    protected $offline;
+    protected $options;
 
     /**
-     * @var boolean true if bower should operate in allow-root mode
-     */
-    protected $allowRoot;
-
-    /**
-     * @param string                            $bowerPath
-     * @param EventDispatcherInterface          $eventDispatcher
-     * @param Package\DependencyMapperInterface $dependencyMapper
-     * @param boolean                           $offline
-     * @param boolean                           $allowRoot
+     * @param string                    $bowerPath
+     * @param EventDispatcherInterface  $eventDispatcher
+     * @param DependencyMapperInterface $dependencyMapper
+     * @param array                     $options
      */
     public function __construct($bowerPath = '/usr/bin/bower', EventDispatcherInterface $eventDispatcher,
-                                DependencyMapperInterface $dependencyMapper = null, $offline = false, $allowRoot = false)
+                                DependencyMapperInterface $dependencyMapper = null, array $options = array())
     {
         $this->bowerPath = $bowerPath;
         $this->eventDispatcher = $eventDispatcher;
         $this->dependencyMapper = $dependencyMapper ?: new DependencyMapper();
-        $this->offline = $offline;
-        $this->allowRoot = $allowRoot;
+        $this->options = $options;
     }
 
     /**
@@ -237,11 +230,9 @@ class Bower
         $pb->setWorkingDirectory($config->getDirectory());
         $pb->setTimeout(600);
         $pb->add($this->bowerPath);
-        if ($this->offline) {
-            $pb->add('--offline');
-        }
-        if ($this->allowRoot) {
-            $pb->add('--allow-root');
+        foreach ($this->options as $key => $value) {
+            $name = is_bool($value) ? sprintf('--%s', $key) : sprintf('--%s %s', $key, $value);
+            $pb->add($name);
         }
 
         foreach ($commands as $command) {

@@ -10,6 +10,7 @@ Changelog
 * Update configuration reference
 * Do not check for service id when using a self defined cache
 * Possible dependency conflicts can now be resolved when running sp:bower:install or sp:bower:update
+* The options `offline` and `allow_root` are now deprecated, use the new `options` array instead
 
 ### 0.11 (2014-07-14)
 

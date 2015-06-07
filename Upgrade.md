@@ -8,8 +8,30 @@ break. For the full list of changes, please look at the Changelog file.
 
 ### Configuration
 
+#### Deprecations
+
 The default value for the option `keep_bowerrc` has changed from `false` to `true`. Also this option is now deprecated
 and will be removed in Version 0.13.
+
+The options `offline` and `allow-root` are now deprecated in favor of the new `options` configuration
+
+Before:
+
+```yml
+sp_bower:
+    offline: true
+    allow_root: true
+    keep_bowerrc: true
+```
+
+After:
+
+```yml
+sp_bower
+    options:
+        offline: true
+        allow-root: true
+```
 
 ## 0.7 to 0.8
 

@@ -7,10 +7,11 @@ All available configuration options are listed below with their default values.
 # app/config/config.yml
 sp_bower:
     install_on_warmup: false # Optional
-    keep_bowerrc: false # Optional
+    keep_bowerrc: true # Optional
     bin: /usr/bin/bower # Optional
-    offline: false # Optional. Set true in situations where you do not have internet capabilities, for example on a plane or your local pub.
-    allow_root: false # optional
+    options:
+        # You can add any option which are available in bower: http://bower.io/docs/api/#options
+        offline: true
     # assetic: ~
     assetic:
         enabled: true

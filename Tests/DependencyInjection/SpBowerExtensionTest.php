@@ -77,7 +77,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->extension->load(array(), $this->container);
 
-        $this->assertParameter(false, 'sp_bower.bower.offline');
+        $this->assertParameter([], 'sp_bower.bower.options');
     }
 
     public function testLoadOffline()
@@ -85,7 +85,7 @@ class SpBowerExtensionTest extends \PHPUnit_Framework_TestCase
         $config = array('sp_bower' => array('offline' => true));
         $this->extension->load($config, $this->container);
 
-        $this->assertParameter(true, 'sp_bower.bower.offline');
+        $this->assertParameter(['offline' => true], 'sp_bower.bower.options');
     }
 
 

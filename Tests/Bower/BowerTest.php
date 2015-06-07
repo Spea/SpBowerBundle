@@ -79,6 +79,7 @@ class BowerTest extends AbstractBowerTest
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process = $this->getMockBuilder('Symfony\Component\Process\Process')->disableOriginalConstructor()->getMock();
     }
+
     /**
      * @covers Sp\BowerBundle\Bower\Bower::install
      * @dataProvider componentsProvider
@@ -88,7 +89,7 @@ class BowerTest extends AbstractBowerTest
         $this->bower = $this->getMock(
             'Sp\BowerBundle\Bower\Bower',
             array('dumpBowerConfig'),
-            array($this->bin, $this->eventDispatcher, $this->dependencyMapper, true));
+            array($this->bin, $this->eventDispatcher, $this->dependencyMapper, array('offline' => true)));
 
         $this->bower->setProcessBuilder($this->processBuilder);
         $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
@@ -96,6 +97,31 @@ class BowerTest extends AbstractBowerTest
         $config = new Configuration($configDir);
         $config->setCache($this->cache);
         $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--offline'));
+        $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
+        $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
+
+        $this->process->expects($this->once())->method('run')->with($this->equalTo(null));
+
+        $this->bower->install($config);
+    }
+
+    /**
+     * @covers Sp\BowerBundle\Bower\Bower::install
+     * @dataProvider componentsProvider
+     */
+    public function testOptionsWithValueInstall($configDir)
+    {
+        $this->bower = $this->getMock(
+            'Sp\BowerBundle\Bower\Bower',
+            array('dumpBowerConfig'),
+            array($this->bin, $this->eventDispatcher, $this->dependencyMapper, array('log-level' => 'debug')));
+
+        $this->bower->setProcessBuilder($this->processBuilder);
+        $this->process->expects($this->once())->method('isSuccessful')->will($this->returnValue(true));
+
+        $config = new Configuration($configDir);
+        $config->setCache($this->cache);
+        $this->processBuilder->expects($this->at(3))->method('add')->with($this->equalTo('--log-level debug'));
         $this->processBuilder->expects($this->once())->method('setWorkingDirectory')->with($this->equalTo($configDir));
         $this->processBuilder->expects($this->once())->method('getProcess')->will($this->returnValue($this->process));
 
