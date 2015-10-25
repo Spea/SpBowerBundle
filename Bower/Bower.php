@@ -242,6 +242,7 @@ class Bower
         $proc = $pb->getProcess();
         // TTY is not available on Windows.
         if(DIRECTORY_SEPARATOR == '/'){
+            $tty = filter_var($tty, FILTER_VALIDATE_BOOLEAN);
             $proc->setTty($tty);
         }
         $proc->run($callback);
