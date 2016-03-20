@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -79,7 +80,15 @@ class SpBowerExtension extends Extension
         $container->setParameter('sp_bower.bower.options', $options);
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
-        $this->loadBundlesInformation($config['bundles'], $container);
+
+        $bundlesConfig = $config['bundles'];
+        $loadAllBundles = !isset($options['parse-all-bundles']) || $options['parse-all-bundles'];
+
+        if ($loadAllBundles) {
+            $bundlesConfig = $this->getAllBundlesConfig($container, $bundlesConfig);
+        }
+
+        $this->loadBundlesInformation($bundlesConfig, $container);
     }
 
     /**
@@ -259,4 +268,22 @@ class SpBowerExtension extends Extension
         return new Reference($defId);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @param array $bundlesConfig
+     * @return array
+     */
+    protected function getAllBundlesConfig(ContainerBuilder $container, $bundlesConfig)
+    {
+        $allBundles = $container->getParameter('kernel.bundles');
+        $bundles = array_fill_keys(array_keys($allBundles), [
+            'config_dir' => Configuration::DEFAULT_CONFIG_DIR,
+            'asset_dir' => Configuration::DEFAULT_ASSERT_DIR,
+            'cache' => array('directory' => Configuration::DEFAULT_CACHE_DIRECTORY),
+            'endpoint' => Configuration::DEFAULT_ENDPOINT,
+            'json_file' => Configuration::DEFAULT_JSON_FILE
+        ]);
+
+        return array_merge($bundles, $bundlesConfig);
+    }
 }

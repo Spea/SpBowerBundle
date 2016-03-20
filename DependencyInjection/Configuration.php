@@ -21,6 +21,13 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_CONFIG_DIR = 'Resources/config/bower';
+    const DEFAULT_CACHE_DIRECTORY = '../../public/components/cache';
+    const DEFAULT_CACHE_ID = null;
+    const DEFAULT_ASSERT_DIR = '../../public/components';
+    const DEFAULT_JSON_FILE = 'bower.json';
+    const DEFAULT_ENDPOINT = 'https://bower.herokuapp.com';
+
     /**
      * {@inheritDoc}
      */
@@ -109,7 +116,7 @@ class Configuration implements ConfigurationInterface
                             ->then(function($v) { return array('config_dir' => $v); })
                         ->end()
                         ->children()
-                            ->scalarNode('config_dir')->defaultValue('Resources/config/bower')->end()
+                            ->scalarNode('config_dir')->defaultValue(self::DEFAULT_CONFIG_DIR)->end()
                             ->arrayNode('cache')
                                 ->beforeNormalization()
                                     ->ifString()
@@ -117,13 +124,13 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->scalarNode('directory')->defaultValue('../../public/components/cache')->end()
-                                    ->scalarNode('id')->defaultValue(null)->end()
+                                    ->scalarNode('directory')->defaultValue(self::DEFAULT_CACHE_DIRECTORY)->end()
+                                    ->scalarNode('id')->defaultValue(self::DEFAULT_CACHE_ID)->end()
                                 ->end()
                             ->end()
-                            ->scalarNode('asset_dir')->defaultValue('../../public/components')->end()
-                            ->scalarNode('json_file')->defaultValue('bower.json')->end()
-                            ->scalarNode('endpoint')->defaultValue('https://bower.herokuapp.com')->end()
+                            ->scalarNode('asset_dir')->defaultValue(self::DEFAULT_ASSERT_DIR)->end()
+                            ->scalarNode('json_file')->defaultValue(self::DEFAULT_JSON_FILE)->end()
+                            ->scalarNode('endpoint')->defaultValue(self::DEFAULT_ENDPOINT)->end()
                         ->end()
                     ->end()
                 ->end()
