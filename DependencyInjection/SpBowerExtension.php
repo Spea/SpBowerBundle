@@ -12,7 +12,6 @@
 namespace Sp\BowerBundle\DependencyInjection;
 
 use RuntimeException;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,7 +20,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -178,12 +176,16 @@ class SpBowerExtension extends Extension
 
             $bundleConfig['config_dir'] = $this->parseDirectory($container, $bundleConfig['config_dir']);
             if (!$this->filesystem->isAbsolutePath($bundleConfig['config_dir'])) {
-                $bundleConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir'];
+                $bundleConfig['config_dir'] = realpath($bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir']);
+            }
+
+            if (!$bundleConfig['config_dir']) {
+                continue;
             }
 
             $bundleConfig['asset_dir'] = $this->parseDirectory($container, $bundleConfig['asset_dir']);
             if (!$this->filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
-                $bundleConfig['asset_dir'] = $bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir'];
+                $bundleConfig['asset_dir'] = realpath($bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir']);
             }
 
             $cacheReference = $this->createCache($container, $bundleName, $bundleConfig['cache'], $bundleConfig['config_dir']);
@@ -279,7 +281,10 @@ class SpBowerExtension extends Extension
         $bundles = array_fill_keys(array_keys($allBundles), [
             'config_dir' => Configuration::DEFAULT_CONFIG_DIR,
             'asset_dir' => Configuration::DEFAULT_ASSERT_DIR,
-            'cache' => array('directory' => Configuration::DEFAULT_CACHE_DIRECTORY),
+            'cache' => array(
+                'directory' => Configuration::DEFAULT_CACHE_DIRECTORY,
+                'id' => Configuration::DEFAULT_CACHE_ID
+            ),
             'endpoint' => Configuration::DEFAULT_ENDPOINT,
             'json_file' => Configuration::DEFAULT_JSON_FILE
         ]);
