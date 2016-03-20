@@ -80,7 +80,7 @@ class SpBowerExtension extends Extension
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
 
         $bundlesConfig = $config['bundles'];
-        $loadAllBundles = !isset($options['parse-all-bundles']) || $options['parse-all-bundles'];
+        $loadAllBundles = isset($options['parse-all-bundles']) && $options['parse-all-bundles'];
 
         if ($loadAllBundles) {
             $bundlesConfig = $this->getAllBundlesConfig($container, $bundlesConfig);
@@ -278,7 +278,7 @@ class SpBowerExtension extends Extension
     protected function getAllBundlesConfig(ContainerBuilder $container, $bundlesConfig)
     {
         $allBundles = $container->getParameter('kernel.bundles');
-        $bundles = array_fill_keys(array_keys($allBundles), [
+        $bundles = array_fill_keys(array_keys($allBundles), array(
             'config_dir' => Configuration::DEFAULT_CONFIG_DIR,
             'asset_dir' => Configuration::DEFAULT_ASSERT_DIR,
             'cache' => array(
@@ -287,7 +287,7 @@ class SpBowerExtension extends Extension
             ),
             'endpoint' => Configuration::DEFAULT_ENDPOINT,
             'json_file' => Configuration::DEFAULT_JSON_FILE
-        ]);
+        ));
 
         return array_merge($bundles, $bundlesConfig);
     }
