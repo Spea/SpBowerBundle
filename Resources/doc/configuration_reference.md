@@ -11,7 +11,7 @@ sp_bower:
     bin: /usr/bin/bower # Optional
     options:
         # You can add any option which are available in bower: http://bower.io/docs/api/#options
-        offline: true
+        offline: true # by default it's false, you have to add it to be true
     # assetic: ~
     assetic:
         enabled: true
