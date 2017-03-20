@@ -1,6 +1,11 @@
 Changelog
 =========
 
+
+### 0.12.1-dev
+
+* add compatibility mode for symfony 3.1
+
 ### 0.12-dev
 
 * Add bowerUpdate to ScriptHandler (thanks to @chellem)
