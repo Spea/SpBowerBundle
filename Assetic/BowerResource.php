@@ -110,7 +110,11 @@ class BowerResource extends ConfigurationResource implements \Serializable
             } catch (FileNotFoundException $ex) {
                 throw $ex;
             } catch (RuntimeException $ex) {
-                throw new RuntimeException('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
+                try {
+                    $this->bower->install($config);
+                } catch (CommandException $ex) {
+                    throw new RuntimeException('Dependency cache keys not yet generated, run "app/console sp:bower:install" to initiate the cache: ' . $ex->getMessage());
+                }
             }
 
             $extensionFormulae = array();
