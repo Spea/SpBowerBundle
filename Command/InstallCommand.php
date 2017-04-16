@@ -55,7 +55,8 @@ EOT
                 $bower->install($configuration, $callback, $input->getOption('interactive'));
             } catch (CommandException $ex) {
                 $output->writeln($ex->getCommandError());
-                throw new RuntimeException("An error occured while installing dependencies");
+                // Better for finding the error:
+                throw new RuntimeException("An error occured while installing dependencies: ". $ex->getMessage());
             }
         }
     }
