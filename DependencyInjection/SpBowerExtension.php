@@ -12,7 +12,6 @@
 namespace Sp\BowerBundle\DependencyInjection;
 
 use RuntimeException;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
@@ -79,7 +78,15 @@ class SpBowerExtension extends Extension
         $container->setParameter('sp_bower.bower.options', $options);
         $container->setParameter('sp_bower.bower.bin', $config['bin']);
         $container->setParameter('sp_bower.install_on_warmup', $config['install_on_warmup']);
-        $this->loadBundlesInformation($config['bundles'], $container);
+
+        $bundlesConfig = $config['bundles'];
+        $loadAllBundles = isset($options['parse-all-bundles']) && $options['parse-all-bundles'];
+
+        if ($loadAllBundles) {
+            $bundlesConfig = $this->getAllBundlesConfig($container, $bundlesConfig);
+        }
+
+        $this->loadBundlesInformation($bundlesConfig, $container);
     }
 
     /**
@@ -169,12 +176,16 @@ class SpBowerExtension extends Extension
 
             $bundleConfig['config_dir'] = $this->parseDirectory($container, $bundleConfig['config_dir']);
             if (!$this->filesystem->isAbsolutePath($bundleConfig['config_dir'])) {
-                $bundleConfig['config_dir'] = $bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir'];
+                $bundleConfig['config_dir'] = realpath($bundleDir.DIRECTORY_SEPARATOR.$bundleConfig['config_dir']);
+            }
+
+            if (!$bundleConfig['config_dir']) {
+                continue;
             }
 
             $bundleConfig['asset_dir'] = $this->parseDirectory($container, $bundleConfig['asset_dir']);
             if (!$this->filesystem->isAbsolutePath($bundleConfig['asset_dir'])) {
-                $bundleConfig['asset_dir'] = $bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir'];
+                $bundleConfig['asset_dir'] = realpath($bundleConfig['config_dir'].DIRECTORY_SEPARATOR.$bundleConfig['asset_dir']);
             }
 
             $cacheReference = $this->createCache($container, $bundleName, $bundleConfig['cache'], $bundleConfig['config_dir']);
@@ -259,4 +270,25 @@ class SpBowerExtension extends Extension
         return new Reference($defId);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @param array $bundlesConfig
+     * @return array
+     */
+    protected function getAllBundlesConfig(ContainerBuilder $container, $bundlesConfig)
+    {
+        $allBundles = $container->getParameter('kernel.bundles');
+        $bundles = array_fill_keys(array_keys($allBundles), array(
+            'config_dir' => Configuration::DEFAULT_CONFIG_DIR,
+            'asset_dir' => Configuration::DEFAULT_ASSERT_DIR,
+            'cache' => array(
+                'directory' => Configuration::DEFAULT_CACHE_DIRECTORY,
+                'id' => Configuration::DEFAULT_CACHE_ID
+            ),
+            'endpoint' => Configuration::DEFAULT_ENDPOINT,
+            'json_file' => Configuration::DEFAULT_JSON_FILE
+        ));
+
+        return array_merge($bundles, $bundlesConfig);
+    }
 }
