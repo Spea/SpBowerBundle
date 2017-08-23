@@ -11,6 +11,28 @@ Features included:
 
 **Caution:** This bundle is developed in sync with [symfony's repository](https://github.com/symfony/symfony).
 
+:warning: This Project Has Been Deprecated :warning:
+====================================================
+
+Thank you for your interest in contributing to this bundle. Unfortunately, **I
+do not plan to continue maintaining this bundle.**
+
+With symfony 3.0 assetic was removed (at least in the standard edition) and some time 
+later the new [Webpack Encore](https://github.com/symfony/webpack-encore) 
+component was announced, thus (and the fact that I stopped using bower myself a while ago)
+I will no longer maintain this bundle.
+
+Feel free to use this bundle as-is but I strongly recommend using other tools
+for asset management (like grunt, gulp or webpack). If you have a project depending on this 
+bundle, I would recommend on migrating it to something else.
+
+If someone wants to take over this bundle, let me know and I will gladly transfer the 
+ownership.
+
+Thanks for your support and using this bundle over the years.
+
+---
+
 ### Bower >= 1.0.0
 
 Since version [0.8](https://github.com/Spea/SpBowerBundle/releases/tag/v0.8) the bundle fully supports bower `>= 1.0.0`.
