@@ -1,7 +1,7 @@
 Changelog
 =========
 
-### 0.12-dev
+### 0.12
 
 * Add bowerUpdate to ScriptHandler (thanks to @chellem)
 * Minor phpcs fixes (thanks to @acrobat)
