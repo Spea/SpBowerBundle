@@ -123,7 +123,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('asset_dir')->defaultValue('../../public/components')->end()
                             ->scalarNode('json_file')->defaultValue('bower.json')->end()
-                            ->scalarNode('endpoint')->defaultValue('https://bower.herokuapp.com')->end()
+                            ->scalarNode('endpoint')->defaultValue('https://registry.bower.io')->end()
                         ->end()
                     ->end()
                 ->end()
